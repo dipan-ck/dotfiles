@@ -58,14 +58,14 @@ PanelWindow {
     // ── Process: find images ──────────────────────────────────────────────────
     Process {
         id: findImages
-        command: [
-            "sh", "-c",
-            `find "${root.home}/Pictures" "${root.home}/Downloads" \
-             -maxdepth 4 -type f \
-             \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \
-                -o -iname '*.webp' -o -iname '*.avif' \\) \
-             2>/dev/null | sort`
-        ]
+command: [
+    "sh", "-c",
+    `find "${root.home}/.config/wall" \
+     -maxdepth 1 -type f \
+     \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \
+        -o -iname '*.webp' -o -iname '*.avif' \\) \
+     2>/dev/null | sort`
+]
         stdout: StdioCollector {
             onStreamFinished: {
                 var lines = this.text.trim().split("\n").filter(l => l.length > 0)

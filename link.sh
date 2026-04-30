@@ -19,35 +19,28 @@ configs=(
   "nvim"
   "gtk-3.0"
   "gtk-4.0"
+  "wall"
 )
 
-echo "Creating symlinks from $DOTFILES_DIR to $CONFIG_DIR"
-echo "----------------------------------------------------"
+echo "Syncing from $CONFIG_DIR to $DOTFILES_DIR"
+echo "------------------------------------------"
 
 for config in "${configs[@]}"; do
-  src="$DOTFILES_DIR/$config"
-  dest="$CONFIG_DIR/$config"
+  src="$CONFIG_DIR/$config"
+  dest="$DOTFILES_DIR/$config"
 
-  # Skip if source doesn't exist in dotfiles yet
+  # Skip if source doesn't exist in .config
   if [ ! -e "$src" ]; then
-    echo -e "${YELLOW}SKIP${NC}   $config  (not found in dotfiles dir)"
+    echo -e "${YELLOW}SKIP${NC}   $config  (not found in .config)"
     continue
   fi
 
-  # Backup if destination exists and is NOT already a symlink
-  if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-    echo -e "${YELLOW}BACKUP${NC} $config  → $dest.bak"
-    mv "$dest" "$dest.bak"
-  fi
+  # Remove old copy in dotfiles dir
+  rm -rf "$dest"
 
-  # Remove existing symlink if broken or outdated
-  if [ -L "$dest" ]; then
-    rm "$dest"
-  fi
-
-  ln -s "$src" "$dest"
-  echo -e "${GREEN}LINKED${NC} $config  → $dest"
+  # Copy fresh from .config
+  cp -r "$src" "$dest"
+  echo -e "${GREEN}SYNCED${NC} $config  → $dest"
 done
 
-echo ""
-echo "Done! Verify with: ls -la ~/.config"
+echo "Done! All configs Synced"
