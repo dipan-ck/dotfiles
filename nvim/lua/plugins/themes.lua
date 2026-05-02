@@ -1,10 +1,20 @@
-return {
-  { "Shatur/neovim-ayu" },
+-- return {
+--   { "Shatur/neovim-ayu" },
+--
+--   {
+--     "LazyVim/LazyVim",
+--     opts = {
+--       colorscheme = "ayu-dark",
+--     },
+--   },
+-- }
+--
 
+return {
   {
-    "LazyVim/LazyVim",
+    "folke/tokyonight.nvim",
     opts = {
-      colorscheme = "ayu-dark",
+      style = "night", -- ← THIS is the variant you want
     },
   },
 }

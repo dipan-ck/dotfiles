@@ -1,7 +1,7 @@
 -- ~/.config/nvim/lua/plugins/mason.lua
 return {
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
         "eslint-lsp",
@@ -12,6 +12,7 @@ return {
         "yamlls",
         "taplo",
         "typescript-language-server",
+        "clangd", -- ← ADD THIS
       },
     },
   },
