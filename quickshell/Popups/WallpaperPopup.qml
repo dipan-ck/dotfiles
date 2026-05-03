@@ -23,7 +23,7 @@ PanelWindow {
 
     color: "transparent"
 
-    // ── Design tokens ─────────────────────────────────────────────────────────
+    // ── Design tokens ──────────────────────────────────────────────────────────
     readonly property color  colorSurface:   Colors.md3.surface_container_low
     readonly property color  colorSection:   Colors.md3.surface_container
     readonly property color  colorHigh:      Colors.md3.surface_container_highest
@@ -36,10 +36,11 @@ PanelWindow {
     readonly property string fontSans:       "Google Sans Flex"
     readonly property string fontMono:       "JetBrainsMono Nerd Font"
 
-    // ── State ─────────────────────────────────────────────────────────────────
-    property var    images:     []
-    property bool   isLoading:  false
-    property string statusText: ""
+    // ── State ──────────────────────────────────────────────────────────────────
+    property var    images:      []
+    property bool   isLoading:   false
+    property string statusText:  ""
+    property bool   isApplying:  false
     readonly property string home: Quickshell.env("HOME") ?? ""
 
     onVisibleChanged: {
@@ -55,24 +56,40 @@ PanelWindow {
         onActivated: root.visible = false
     }
 
-    // ── Process: find images ──────────────────────────────────────────────────
+    // ── Process: find images ───────────────────────────────────────────────────
     Process {
         id: findImages
-command: [
-    "sh", "-c",
-    `find "${root.home}/.config/wall" \
-     -maxdepth 1 -type f \
-     \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \
-        -o -iname '*.webp' -o -iname '*.avif' \\) \
-     2>/dev/null | sort`
-]
+        command: [
+            "sh", "-c",
+            `find "${root.home}/.config/wall" \
+             -maxdepth 1 -type f \
+             \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \
+                -o -iname '*.webp' -o -iname '*.avif' \\) \
+             2>/dev/null | sort`
+        ]
         stdout: StdioCollector {
             onStreamFinished: {
                 var lines = this.text.trim().split("\n").filter(l => l.length > 0)
                 root.images    = lines
                 root.isLoading = false
                 if (lines.length === 0)
-                    root.statusText = "No images found in ~/Pictures or ~/Downloads"
+                    root.statusText = "No images found in ~/.config/wall"
+            }
+        }
+    }
+
+    // ── Process: detect image saturation (ImageMagick) ────────────────────────
+    // outputs a single float like "12.5" — mean saturation 0-100
+    // if < threshold we treat image as grayscale and use scheme-monochrome
+    property string pendingPath: ""
+
+    Process {
+        id: saturationProc
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var sat = parseFloat(this.text.trim())
+                var isGray = isNaN(sat) || sat < 8.0
+                root._runMatugen(root.pendingPath, isGray)
             }
         }
     }
@@ -85,17 +102,41 @@ command: [
                 matugenProc.running = true
         }
     }
+
     Process {
         id: matugenProc
         onRunningChanged: {
-            if (!running && notifyProc.command.length > 0)
-                notifyProc.running = true
+            if (!running) {
+                root.isApplying = false
+                if (notifyProc.command.length > 0)
+                    notifyProc.running = true
+            }
         }
     }
+
     Process { id: notifyProc }
 
+    // ── Internal: run matugen with correct scheme type ────────────────────────
+    function _runMatugen(path, isGray) {
+        var schemeType = isGray ? "scheme-monochrome" : "scheme-fidelity"
+        matugenProc.command = [
+            "matugen", "image",
+            "--prefer",     "lightness",
+            "--type",     schemeType,
+            "--contrast", "0.1",
+            path
+        ]
+        matugenProc.running = true
+    }
+
+    // ── Public: apply wallpaper ───────────────────────────────────────────────
     function applyWallpaper(path) {
+        root.isApplying  = true
+        root.pendingPath = path
+        root.visible     = false
+
         var fname = path.split("/").pop()
+
         swwwProc.command = [
             "awww", "img", path,
             "--transition-type",     "grow",
@@ -103,15 +144,21 @@ command: [
             "--transition-duration", "1.5",
             "--transition-fps",      "60"
         ]
-        matugenProc.command = [
-            "matugen", "image", "--prefer", "lightness", path
-        ]
+
         notifyProc.command = [
-            "notify-send", 
+            "notify-send",
             "Wallpaper Applied", fname + "\nColor scheme regenerated"
         ]
-        swwwProc.running = true
-        root.visible     = false
+
+        // detect saturation first — matugen runs in saturationProc callback
+        saturationProc.command = [
+            "sh", "-c",
+            `convert "${path}" -colorspace HSL -channel Saturation \
+             -separate -format "%[fx:mean*100]\\n" info: 2>/dev/null || echo 50`
+        ]
+
+        swwwProc.running       = true
+        saturationProc.running = true
     }
 
     // ── Dim backdrop ──────────────────────────────────────────────────────────
@@ -144,7 +191,7 @@ command: [
             }
             spacing: 12
 
-            // ── Header ────────────────────────────────────────────────────
+            // ── Header ────────────────────────────────────────────────────────
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 10
@@ -163,12 +210,12 @@ command: [
                 }
 
                 Text {
-                    text:           "Wallpaper Picker"
-                    color:          root.colorOnSurface
-                    font.family:    root.fontSans
-                    font.pixelSize: 16
-                    font.weight:    Font.SemiBold
-                    renderType:     Text.NativeRendering
+                    text:             "Wallpaper Picker"
+                    color:            root.colorOnSurface
+                    font.family:      root.fontSans
+                    font.pixelSize:   16
+                    font.weight:      Font.SemiBold
+                    renderType:       Text.NativeRendering
                     Layout.fillWidth: true
                 }
 
@@ -198,7 +245,7 @@ command: [
                 }
             }
 
-            // ── Divider ───────────────────────────────────────────────────
+            // ── Divider ───────────────────────────────────────────────────────
             Rectangle {
                 Layout.fillWidth: true
                 height:           1
@@ -206,7 +253,7 @@ command: [
                 opacity:          0.6
             }
 
-            // ── Loading / empty state ─────────────────────────────────────
+            // ── Loading / empty state ─────────────────────────────────────────
             Item {
                 Layout.fillWidth:  true
                 Layout.fillHeight: true
@@ -219,7 +266,7 @@ command: [
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: 36; height: 36; radius: 18
-                        color: "transparent"
+                        color:        "transparent"
                         border.width: 3
                         border.color: root.colorPrimary
                         visible:      root.isLoading
@@ -234,16 +281,16 @@ command: [
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text:            root.isLoading ? "Scanning images…" : root.statusText
-                        color:           root.colorMuted
-                        font.family:     root.fontSans
-                        font.pixelSize:  14
-                        renderType:      Text.NativeRendering
+                        text:           root.isLoading ? "Scanning images…" : root.statusText
+                        color:          root.colorMuted
+                        font.family:    root.fontSans
+                        font.pixelSize: 14
+                        renderType:     Text.NativeRendering
                     }
                 }
             }
 
-            // ── Grid ──────────────────────────────────────────────────────
+            // ── Grid ──────────────────────────────────────────────────────────
             ScrollView {
                 Layout.fillWidth:  true
                 Layout.fillHeight: true
@@ -300,6 +347,7 @@ command: [
                                 }
                             }
 
+                            // ── hover overlay ─────────────────────────────────
                             Rectangle {
                                 anchors.fill: parent
                                 radius:       0
@@ -327,10 +375,10 @@ command: [
                                             var f = modelData.split("/").pop()
                                             return f.length > 24 ? f.substring(0, 22) + "…" : f
                                         }
-                                        font.family:     root.fontSans
-                                        font.pixelSize:  10
-                                        color:           Qt.rgba(1, 1, 1, 0.70)
-                                        renderType:      Text.NativeRendering
+                                        font.family:    root.fontSans
+                                        font.pixelSize: 10
+                                        color:          Qt.rgba(1, 1, 1, 0.70)
+                                        renderType:     Text.NativeRendering
                                     }
                                 }
                             }

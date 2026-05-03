@@ -20,11 +20,15 @@ Scope {
             screen: modelData
 
             anchors { top: true; left: true; right: true }
-            height: 35
+            height: 32
             color:  "transparent"
 
-            readonly property int   pillHeight:    30
-            readonly property int   pillRadius:    12
+            // ── design tokens ─────────────────────────────────────────
+            readonly property int   pillHeight:    28
+            readonly property int   pillRadius:    200
+            readonly property int   pillSpacing:   8
+            readonly property int   barMargin:     12
+
             readonly property color colorSurface:  Colors.md3.surface_container_low
             readonly property color colorAccent:   Colors.md3.primary
             readonly property color colorOnAccent: Colors.md3.on_primary
@@ -32,15 +36,18 @@ Scope {
             readonly property color colorInactive: Colors.md3.on_surface_variant
             readonly property color colorWarning:  Colors.md3.error
 
+            // ── root layout ───────────────────────────────────────────
             RowLayout {
-                anchors.fill: parent
-                anchors.leftMargin:  12
-                anchors.rightMargin: 12
+                anchors {
+                    fill:        parent
+                    leftMargin:  bar.barMargin
+                    rightMargin: bar.barMargin
+                }
                 spacing: 0
 
                 // ── LEFT ─────────────────────────────────────────────
                 Row {
-                    spacing: 8
+                    spacing:          bar.pillSpacing
                     Layout.alignment: Qt.AlignVCenter
 
                     ArchLogo {
@@ -70,7 +77,7 @@ Scope {
 
                     Row {
                         anchors.centerIn: parent
-                        spacing: 8
+                        spacing:          bar.pillSpacing
 
                         ResourcePill {
                             pillHeight:   bar.pillHeight
@@ -100,7 +107,6 @@ Scope {
                             colorInactive:     bar.colorInactive
                             colorWarning:      bar.colorWarning
                             windowContentItem: bar.contentItem
-
                             onBatteryClicked: (centerX, bottomY) => {
                                 batteryPopup.anchor.rect.x = centerX - batteryPopup.width / 2
                                 batteryPopup.anchor.rect.y = bottomY + 6
@@ -112,7 +118,7 @@ Scope {
 
                 // ── RIGHT ────────────────────────────────────────────
                 Row {
-                    spacing: 8
+                    spacing:          bar.pillSpacing
                     Layout.alignment: Qt.AlignVCenter
 
                     SystemTrayPill {
@@ -125,7 +131,6 @@ Scope {
                         colorInactive:     bar.colorInactive
                         windowContentItem: bar.contentItem
                     }
-
 
                     WifiBluetoothPowerPill {
                         pillHeight:   bar.pillHeight
@@ -140,6 +145,7 @@ Scope {
                 }
             }
 
+            // ── popups & panels ───────────────────────────────────────
             BatteryPopup {
                 id:            batteryPopup
                 visible:       false

@@ -9,7 +9,7 @@ Rectangle {
     property color colorAccent:  "#000000"
 
     height: pillHeight
-    width:  height
+    width:  height + 8
     radius: pillRadius
     color:  colorSurface
 
@@ -17,7 +17,7 @@ Rectangle {
         anchors.centerIn: parent
         text:             "󰣇"
         font.family:      "JetBrainsMono Nerd Font"
-        font.pixelSize:   20
+        font.pixelSize:   18
         font.weight:      Font.Bold
         color:            root.colorAccent
         renderType:       Text.NativeRendering
