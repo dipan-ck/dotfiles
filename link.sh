@@ -21,6 +21,8 @@ configs=(
   "gtk-4.0"
   "wall"
   "rofi"
+  "waybar"
+  "swaync"
 )
 
 echo "Syncing from $CONFIG_DIR to $DOTFILES_DIR"

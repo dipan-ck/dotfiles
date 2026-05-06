@@ -49,7 +49,7 @@ else
 fi
 
 matugen image \
-  --prefer darkness \
+  --prefer lightness \
   --type "$scheme" \
   "$chosen_path"
 

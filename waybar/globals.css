@@ -1,0 +1,177 @@
+@import "colors.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    transition: all 150ms ease;
+}
+
+window#waybar {
+    background-color: @surface-container-lowest;
+}
+
+/* ── Shared pill base ── */
+#custom-app-launcher,
+#workspaces,
+#taskbar,
+#mpris,
+#clock,
+#hardware,
+#connectivity,
+#status-pill,
+#tray {
+    background-color: @surface-container-low;
+    color: @on-surface;
+    padding: 0 10px;
+    margin: 3px 3px;
+    border-radius: 999px;
+    min-height: 0;
+}
+
+/* ── App Launcher ── */
+#custom-app-launcher {
+    font-size: 16px;
+    padding: 0 14px;
+}
+#custom-app-launcher:hover {
+}
+
+/* ── Workspaces ── */
+#workspaces {
+    padding: 0 4px;
+}
+#workspaces button {
+    padding: 0 7px;
+    color: @on-surface-variant;
+    border-radius: 999px;
+    margin: 2px 1px;
+    min-height: 0;
+    background: transparent;
+}
+#workspaces button.active {
+    background-color: @primary;
+    color: @on-primary;
+    padding: 0 10px;
+}
+#workspaces button:hover {
+    background-color: @surface-container-highest;
+    color: @on-surface;
+}
+#workspaces button.urgent {
+    background-color: @error-container;
+    color: @error;
+}
+
+/* ── Taskbar ── */
+#taskbar {
+    padding: 0 6px;
+}
+
+/* ── Clock & MPRIS ── */
+#clock {
+    color: @on-surface;
+    letter-spacing: 0.5px;
+}
+#clock:hover {
+    color: @primary;
+}
+#mpris {
+    color: @primary;
+    min-width: 220px;
+}
+
+/* ── Hardware pill internals ── */
+#cpu, #memory, #custom-gpu {
+    padding: 0 7px;
+    color: @on-surface-variant;
+}
+#cpu:hover, #memory:hover, #custom-gpu:hover {
+    color: @primary;
+}
+
+/* ── Connectivity pill internals ── */
+#network, #bluetooth, #pulseaudio, #backlight, #custom-eye {
+    padding: 0 7px;
+    color: @on-surface-variant;
+}
+#network:hover, #bluetooth:hover, #pulseaudio:hover, #backlight:hover {
+    color: @primary;
+}
+#network.disconnected {
+    color: @error;
+}
+#bluetooth.connected {
+    color: @primary;
+}
+
+/* ── Eye care states ── */
+#custom-eye {
+    color: @on-surface-variant;
+}
+#custom-eye.warm   { color: #ffcc66; }
+#custom-eye.warmer { color: #ff9944; }
+#custom-eye.hot    { color: #ff6622; }
+#custom-eye:hover  { color: @primary; }
+
+/* ── Status pill internals ── */
+#custom-notification, #battery, #custom-power {
+    padding: 0 7px;
+}
+#custom-notification {
+    color: @on-surface-variant;
+}
+#custom-notification.notification {
+    color: @primary;
+}
+#custom-notification.dnd-notification,
+#custom-notification.dnd-none {
+    color: @on-surface-variant;
+    opacity: 0.6;
+}
+
+#battery {
+    color: @on-surface-variant;
+}
+#battery.charging {
+    color: #a8cc8c;
+}
+#battery.warning:not(.charging) {
+    color: #ffaa00;
+}
+#battery.critical:not(.charging) {
+    color: @error;
+    animation: blink 0.5s ease-in-out infinite alternate;
+}
+
+#custom-power {
+    color: @error;
+    padding-left: 4px;
+}
+#custom-power:hover {
+    color: @on-error;
+    background-color: @error;
+    border-radius: 999px;
+}
+
+/* ── Tray ── */
+#tray {
+    padding: 0 8px;
+    margin-right: 6px;
+}
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: @error-container;
+    border-radius: 999px;
+}
+
+/* ── Blink animation ── */
+@keyframes blink {
+    to { opacity: 0.4; }
+}

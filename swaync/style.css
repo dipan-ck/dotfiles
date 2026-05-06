@@ -1,0 +1,388 @@
+@import "colors.css";
+
+* {
+	font-family: "JetBrainsMono Nerd Font", "Noto Sans", sans-serif;
+	font-weight: 700;
+	all: unset;
+
+	--border-radius: 16px;
+	--border-radius-s: 8px;
+	--border-radius-xl: 18px;
+	--shadow: 2px 4px 12px rgba(0, 0, 0, 0.25);
+	--transition: 180ms ease;
+}
+
+/* ── Notification popups ─────────────────────────────────── */
+
+.notification {
+	padding: 5px;
+}
+
+.notification-background {
+	background: @notification-bg;
+	border-radius: var(--border-radius);
+	border: 1px solid alpha(@selected, 0.12);
+	margin: 8px;
+	padding: 0;
+	box-shadow: var(--shadow);
+}
+
+.notification-background .close-button {
+	margin: 6px;
+	padding: 2px 5px;
+	border-radius: 6px;
+	background: transparent;
+	color: @text-alt;
+	transition: var(--transition);
+}
+
+.notification-background .close-button:hover {
+	background: @hover;
+	color: @text;
+}
+
+.notification.critical {
+	border: 2px solid @urgent;
+	border-radius: var(--border-radius);
+}
+
+.notification-content {
+	color: @text;
+	margin: 12px;
+	font-weight: 700;
+}
+
+.notification-content .text-box {
+	margin: 0 0 0 14px;
+}
+
+.notification-content .time {
+	padding: 2px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: @text-alt;
+}
+
+.notification-content .summary {
+	font-size: 1rem;
+	font-weight: 800;
+	padding: 2px 0;
+	margin-bottom: 3px;
+	color: @text;
+}
+
+.notification-content .body {
+	color: @text-alt;
+	font-size: 0.82rem;
+	font-weight: 500;
+}
+
+/* ── Inline reply ────────────────────────────────────────── */
+
+.notification-row .inline-reply-entry,
+.notification-row .inline-reply-button {
+	margin: 5px -5px -5px -5px;
+	padding: 10px 15px;
+	border-radius: var(--border-radius);
+	background: @background-alt;
+}
+
+.notification-row .inline-reply-entry {
+	margin-right: 10px;
+	color: @text;
+}
+
+.notification-row .inline-reply-button:hover {
+	background: @selected;
+	color: @background;
+}
+
+/* ── Notification actions ────────────────────────────────── */
+
+.notification-alt-actions {
+	padding: 5px 0;
+}
+
+.notification-action {
+	font-weight: 700;
+	border-radius: var(--border-radius);
+	background: alpha(@hover, 0.8);
+	color: @text;
+	margin: 0 5px;
+	padding: 8px 0;
+	transition: var(--transition);
+}
+
+.notification-action:hover,
+.notification-action:active {
+	background: @selected;
+	color: @background;
+}
+
+/* ── Control center ──────────────────────────────────────── */
+
+.control-center {
+	background: @center-bg;
+	border-radius: var(--border-radius);
+	border: 1px solid alpha(@selected, 0.1);
+	margin: 5px;
+	padding: 5px 5px 0 5px;
+	box-shadow: var(--shadow);
+}
+
+.control-center .notification-background {
+	background: @center-notification-bg;
+	border: 1px solid alpha(@selected, 0.08);
+	box-shadow: var(--shadow);
+}
+
+/* Hide close buttons inside notification center */
+.control-center .notification-background .close-button,
+.notification-group-close-button {
+	opacity: 0;
+}
+
+/* ── Notification groups ─────────────────────────────────── */
+
+.notification-group {
+	transition: var(--transition);
+}
+
+.notification-group:not(.collapsed) {
+	margin: 8px;
+}
+
+.notification-group-headers,
+.notification-group-buttons {
+	color: @text;
+	font-weight: bold;
+	background: @background-alt;
+	border-radius: var(--border-radius);
+	padding: 4px 10px;
+}
+
+.notification-group-headers > label {
+	margin: 0 3px;
+	font-size: 1rem;
+}
+
+.notification-group-icon {
+	color: @selected;
+}
+
+.notification-group-buttons .image-button {
+	background: transparent;
+	color: @text-alt;
+	padding: 4px;
+	border-radius: var(--border-radius);
+	transition: var(--transition);
+}
+
+.notification-group-buttons .image-button:hover {
+	background: @hover;
+	color: @text;
+}
+
+/* ── Widgets ─────────────────────────────────────────────── */
+
+.widget {
+	margin: 5px;
+	color: @text;
+}
+
+/* MPRIS */
+
+.widget-mpris-album-art {
+	border-radius: var(--border-radius);
+	margin: 6px 4px;
+}
+
+.widget-mpris-title {
+	font-weight: 800;
+	font-size: 1.1rem;
+	margin: 0 3px;
+	color: @text;
+}
+
+.widget-mpris-subtitle {
+	color: @text-alt;
+	font-weight: 600;
+	font-size: 0.88rem;
+	margin: 0 3px;
+}
+
+.mpris-background {
+	border-radius: 14px;
+	margin: 3px;
+}
+
+.widget-mpris {
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow);
+}
+
+.mpris-overlay {
+	border-radius: var(--border-radius);
+	padding: 10px;
+	background: alpha(@background, 0.85);
+}
+
+.mpris-overlay > box:last-child {
+	border-radius: var(--border-radius-xl);
+	padding: 0 5px;
+	background: alpha(@hover, 0.5);
+}
+
+.widget-mpris-player button {
+	padding: 6px;
+	margin: 0 2.5px;
+	color: @text-alt;
+	border-radius: var(--border-radius-s);
+	transition: var(--transition);
+}
+
+.widget-mpris-player button:hover {
+	background: @hover;
+	color: @text;
+}
+
+/* Do Not Disturb */
+
+.widget-dnd {
+	padding: 10px 15px;
+	border-radius: var(--border-radius);
+	background: @background-alt;
+	border: 1px solid alpha(@selected, 0.1);
+	box-shadow: var(--shadow);
+	color: @text;
+}
+
+.widget-dnd > label {
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+.widget-dnd switch {
+	background: @hover;
+	border-radius: var(--border-radius-s);
+	box-shadow: none;
+	padding: 2px;
+	transition: var(--transition);
+}
+
+.widget-dnd switch slider {
+	background: @text-alt;
+	border-radius: var(--border-radius-s);
+}
+
+.widget-dnd switch:hover {
+	background: alpha(@selected, 0.4);
+}
+
+.widget-dnd switch:checked {
+	background: @selected;
+}
+
+.widget-dnd switch:checked slider {
+	background: @background;
+}
+
+/* Notifications list */
+
+.widget-notifications {
+	margin: 0;
+}
+
+/* Button grid */
+
+.widget-buttons-grid {
+	border-radius: var(--border-radius);
+	padding: 8px 15px;
+	margin-bottom: 5px;
+	background: @background-alt;
+	border: 1px solid alpha(@selected, 0.08);
+	box-shadow: var(--shadow);
+}
+
+.widget-buttons-grid button {
+	padding: 10px;
+	margin: 3px;
+	min-width: 2rem;
+	background: @hover;
+	border-radius: var(--border-radius);
+	transition: var(--transition);
+}
+
+.widget-buttons-grid button > label {
+	font-family: "CaskaydiaCove Nerd Font Propo";
+	font-size: 16px;
+	color: @text-alt;
+}
+
+.widget-buttons-grid button:hover {
+	background: alpha(@selected, 0.3);
+}
+
+.widget-buttons-grid button:hover > label {
+	color: @text;
+}
+
+.widget-buttons-grid button:checked {
+	background: @selected;
+}
+
+.widget-buttons-grid button:checked > label {
+	color: @background;
+}
+
+/* Volume & Backlight sliders */
+
+.widget-volume,
+.widget-backlight {
+	padding: 8px 14px;
+	margin: 5px 0;
+	border-radius: 12px;
+	color: @text;
+	font-weight: 800;
+	background: @background-alt;
+	border: 1px solid alpha(@selected, 0.08);
+}
+
+.widget-volume label,
+.widget-backlight label {
+	font-size: 1rem;
+	color: @text-alt;
+}
+
+.widget-volume slider,
+.widget-backlight slider {
+	border-radius: 24px;
+	margin: -8px;
+	background: @selected;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.widget-volume trough,
+.widget-backlight trough {
+	background: @hover;
+	margin-left: 8px;
+	border-radius: 12px;
+}
+
+.widget-volume highlight,
+.widget-backlight highlight {
+	padding: 3.5px;
+	border-radius: 12px;
+	background: alpha(@selected, 0.5);
+}
+
+/* ── Misc ────────────────────────────────────────────────── */
+
+.control-center-list-placeholder {
+	color: @text-alt;
+	font-size: 0.9rem;
+}
+
+.blank-window {
+	background: transparent;
+}
