@@ -1,0 +1,142 @@
+configuration {
+    modi:                 "dmenu";
+    show-icons:           true;
+    kb-element-next:      "";
+    kb-element-prev:      "";
+    kb-move-char-back:    "";
+    kb-move-char-forward: "";
+    kb-row-right:         "Right";
+    kb-row-left:          "Left";
+    kb-accept-entry:      "Return";
+}
+
+@import "colors.rasi"
+
+* {
+    font:             "Google Sans Flex 11";
+    bg:               @surface;
+    bg-low:           @surface-container-lowest;
+    bg-panel:         @surface-container;
+    bg-high:          @surface-container-high;
+    fg:               @on-surface;
+    fg-muted:         @on-surface-variant;
+    accent:           @primary;
+    selected-bg:      @primary-container;
+    selected-fg:      @on-primary-container;
+    border-col:       @outline-variant;
+    urgent-col:       @error;
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    width:            1100px;
+    height:           500px;
+    border-radius:    20px;
+    border:           1px solid;
+    border-color:     @border-col;
+    background-color: @bg;
+    cursor:           "default";
+}
+
+mainbox {
+    spacing:          0px;
+    padding:          20px;
+    orientation:      vertical;
+    background-color: transparent;
+    children:         [ "inputbar", "listview" ];
+}
+
+inputbar {
+    spacing:          8px;
+    padding:          10px 14px;
+    margin:           0px 0px 14px 0px;
+    border-radius:    10px;
+    border:           1px solid;
+    border-color:     @border-col;
+    background-color: @bg-panel;
+    text-color:       @fg;
+    children:         [ "textbox-prompt-colon", "entry" ];
+}
+
+textbox-prompt-colon {
+    expand:           false;
+    str:              "󰸉 ";
+    font:             "Google Sans Flex 13";
+    background-color: transparent;
+    text-color:       @accent;
+}
+
+entry {
+    background-color:  transparent;
+    text-color:        @fg;
+    cursor:            text;
+    placeholder:       "Filter wallpapers...";
+    placeholder-color: @fg-muted;
+}
+
+listview {
+    columns:          4;
+    lines:            1;
+    cycle:            true;
+    dynamic:          true;
+    scrollbar:        false;
+    layout:           vertical;
+    fixed-height:     true;
+    fixed-columns:    true;
+    spacing:          12px;
+    background-color: transparent;
+    cursor:           "default";
+}
+
+element {
+    orientation:      vertical;
+    spacing:          0px;
+    padding:          0px;
+    border-radius:    14px;
+    border:           2px solid;
+    border-color:     transparent;
+    background-color: @bg-panel;
+    cursor:           pointer;
+}
+
+element normal.normal {
+    border-color:     transparent;
+    background-color: @bg-panel;
+}
+
+element selected.normal {
+    border-color:     @accent;
+    background-color: @bg-panel;
+}
+
+element-icon {
+    size:                340px;
+    border-radius:       14px;
+    background-color:    @bg-low;
+    cursor:              inherit;
+    vertical-align:      0.5;
+    horizontal-align:    0.5;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       transparent;
+    cursor:           inherit;
+    font:             "Google Sans Flex 1";
+    str:              "";
+}
+
+message {
+    background-color: transparent;
+}
+
+error-message {
+    padding:          14px;
+    border-radius:    12px;
+    background-color: @bg-high;
+    text-color:       @urgent-col;
+}

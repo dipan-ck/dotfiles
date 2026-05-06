@@ -17,6 +17,9 @@ Rectangle {
     property color colorWarning:      "#000000"
     property Item  windowContentItem: null
 
+    border.width: 1
+    border.color: "#363535"
+
     readonly property real batteryPercent:  UPower.displayDevice.percentage * 100
     // onBattery = true means discharging; false means on AC (charging or full)
     readonly property bool batteryCharging: !UPower.onBattery

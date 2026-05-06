@@ -15,6 +15,8 @@ Rectangle {
     radius:        pillRadius
     color:         colorSurface
     implicitWidth: workspaceRow.implicitWidth + 16
+    border.width: 1
+    border.color: "#363535"
 
     Item {
         anchors.fill: parent
@@ -24,7 +26,6 @@ Rectangle {
             readonly property int itemSize: 20
             readonly property int itemSpacing: 8
             readonly property int leftPad: 8
-
             height: itemSize
             width:  itemSize
             radius: root.pillRadius

@@ -6,7 +6,8 @@ import Quickshell.Bluetooth
 
 Rectangle {
     id: root
-
+    border.width: 1
+    border.color: "#363535"
     property int   pillHeight:   30
     property int   pillRadius:   1000
     property color colorSurface: "#000000"
@@ -15,7 +16,6 @@ Rectangle {
     property color colorDull:    "#555555"
 
     signal clicked()
-    signal powerClicked()
 
     // ── WiFi / BT state ──────────────────────────────────────────────────────
     readonly property bool wifiOn: Networking.wifiEnabled
@@ -72,27 +72,6 @@ Rectangle {
             }
         }
 
-        // ── Power icon ────────────────────────────────────────────────────────
-        Text {
-            id:             powerIcon
-            text:           "󰐥"
-            font.family:    "JetBrainsMono Nerd Font"
-            font.pixelSize: 14
-            renderType:     Text.NativeRendering
-            anchors.verticalCenter: parent.verticalCenter
 
-            color: powerArea.containsMouse
-                ? Qt.lighter(root.colorText, 1.5)
-                : root.colorText
-            Behavior on color { ColorAnimation { duration: 120 } }
-
-            MouseArea {
-                id:           powerArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape:  Qt.PointingHandCursor
-                onClicked:    root.powerClicked()
-            }
-        }
     }
 }

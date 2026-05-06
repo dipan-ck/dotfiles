@@ -6,7 +6,8 @@ import Quickshell.Services.SystemTray
 
 Rectangle {
     id: root
-
+    border.width: 1
+    border.color: "#363535"
     property int   pillHeight:    30
     property int   pillRadius:    12
     property color colorSurface:  "#1e1e2e"

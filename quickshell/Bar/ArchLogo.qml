@@ -7,6 +7,8 @@ Rectangle {
     property int   pillRadius:   1000
     property color colorSurface: "#000000"
     property color colorAccent:  "#000000"
+    border.width: 1
+    border.color: "#363535"
 
     height: pillHeight
     width:  height + 8

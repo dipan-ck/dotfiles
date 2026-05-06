@@ -14,7 +14,8 @@ Rectangle {
     radius:        pillRadius
     color:         colorSurface
     implicitWidth: resRow.implicitWidth + 24
-
+    border.width: 1
+    border.color: "#363535"
     Row {
         id: resRow
         anchors.centerIn: parent

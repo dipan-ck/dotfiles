@@ -9,6 +9,9 @@ Rectangle {
     property color colorText:         "#000000"
     property Item  windowContentItem: null
 
+    border.width: 1
+    border.color: "#363535"
+
     signal clicked(real centerX, real bottomY)
 
     // Internal time/date state

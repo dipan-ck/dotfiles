@@ -88,7 +88,7 @@ PanelWindow {
         stdout: StdioCollector {
             onStreamFinished: {
                 var sat = parseFloat(this.text.trim())
-                var isGray = isNaN(sat) || sat < 8.0
+                var isGray = isNaN(sat) || sat < 5.0
                 root._runMatugen(root.pendingPath, isGray)
             }
         }
@@ -121,9 +121,8 @@ PanelWindow {
         var schemeType = isGray ? "scheme-monochrome" : "scheme-fidelity"
         matugenProc.command = [
             "matugen", "image",
-            "--prefer",     "lightness",
+            "--prefer",     "darkness",
             "--type",     schemeType,
-            "--contrast", "0.1",
             path
         ]
         matugenProc.running = true

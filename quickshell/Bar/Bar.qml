@@ -140,7 +140,6 @@ Scope {
                         colorPrimary: bar.colorAccent
                         colorDull:    bar.colorInactive
                         onClicked:      notificationPanel.toggle()
-                        onPowerClicked: powerMenu.toggle()
                     }
                 }
             }
