@@ -7,20 +7,19 @@ lastlogin="$(last $USER | head -n1 | tr -s ' ' | cut -d' ' -f5,6,7)"
 uptime="$(uptime -p | sed -e 's/up //g')"
 host=$(hostname)
 
-# Font Awesome codepoints — safe range, always in JetBrains Mono Nerd Font
-lock=$(printf '\uf023')      # fa-lock
-suspend=$(printf '\uf186')   # fa-moon-o
-logout=$(printf '\uf08b')    # fa-sign-out
-hibernate=$(printf '\uf236') # fa-bed
-reboot=$(printf '\uf021')    # fa-refresh
-shutdown=$(printf '\uf011')  # fa-power-off
-yes=$(printf '\uf00c')       # fa-check
-no=$(printf '\uf00d')        # fa-times
+lock=$(printf '\uf023')
+sleep=$(printf ' ')
+logout=$(printf '\uf08b')
+reboot=$(printf '\uf021')
+shutdown=$(printf '\uf011')
+
+yes=$(printf '\uf00c')
+no=$(printf '\uf00d')
 
 rofi_cmd() {
   rofi -dmenu \
-    -p "$(printf '\uf007') $USER@$host" \
-    -mesg "$(printf '\uf017') Last Login: $lastlogin  |  $(printf '\uf021') Uptime: $uptime" \
+    -p "$(printf '\uf007')  $USER@$host" \
+    -mesg "$(printf '\uf017')  Last Login: $lastlogin   |   $(printf '\uf2f2')  Uptime: $uptime" \
     -theme "${dir}/${theme}.rasi"
 }
 
@@ -33,7 +32,7 @@ confirm_cmd() {
     -theme-str 'textbox {horizontal-align: 0.5;}' \
     -dmenu \
     -p 'Confirmation' \
-    -mesg 'Are you Sure?' \
+    -mesg 'Are you sure?' \
     -theme "${dir}/${theme}.rasi"
 }
 
@@ -42,7 +41,7 @@ confirm_exit() {
 }
 
 run_rofi() {
-  echo -e "$lock\n$suspend\n$logout\n$hibernate\n$reboot\n$shutdown" | rofi_cmd
+  echo -e "$lock\n$sleep\n$logout\n$reboot\n$shutdown" | rofi_cmd
 }
 
 run_cmd() {
@@ -51,8 +50,7 @@ run_cmd() {
     case $1 in
     --shutdown) systemctl poweroff ;;
     --reboot) systemctl reboot ;;
-    --hibernate) systemctl hibernate ;;
-    --suspend) systemctl suspend ;;
+    --sleep) loginctl suspend ;;
     --logout) hyprctl dispatch exit ;;
     esac
   else
@@ -71,11 +69,11 @@ run_lock() {
 }
 
 chosen="$(run_rofi)"
-case ${chosen} in
-"$shutdown") run_cmd --shutdown ;;
-"$reboot") run_cmd --reboot ;;
-"$hibernate") run_cmd --hibernate ;;
+
+case "$chosen" in
 "$lock") run_lock ;;
-"$suspend") run_cmd --suspend ;;
+"$sleep") run_cmd --sleep ;;
 "$logout") run_cmd --logout ;;
+"$reboot") run_cmd --reboot ;;
+"$shutdown") run_cmd --shutdown ;;
 esac

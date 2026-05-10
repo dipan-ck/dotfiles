@@ -1,0 +1,234 @@
+@import "colors.rasi"
+
+/*****----- Configuration -----*****/
+configuration {
+    modi:                "drun,filebrowser,window";
+    show-icons:          true;
+    icon-theme:          "Papirus-Dark";
+    display-drun:        "  Apps";
+    display-filebrowser: "  Files";
+    display-window:      "  Windows";
+    drun-display-format: "{name}";
+    window-format:       "{w} · {c} · {t}";
+    terminal:            "kitty";
+    kb-mode-next:        "Tab";
+    kb-mode-previous:    "ISO_Left_Tab";
+    kb-element-next:     "";
+    kb-element-prev:     "";
+}
+
+/*****----- Global -----*****/
+* {
+    font:             "Google Sans Flex 12";
+
+    bg:               @surface;
+    bg-low:           @surface-container-lowest;
+    bg-panel:         @surface-container;
+    bg-high:          @surface-container-high;
+
+    fg:               @on-surface;
+    fg-muted:         @on-surface-variant;
+
+    accent:           @primary;
+    selected-bg:      @primary;
+    selected-fg:      @on-primary-container;
+
+    border-col:       @outline-variant;
+    urgent-col:       @error;
+
+    background-color: transparent;
+    text-color:       @on-surface;
+}
+
+/*****----- Window -----*****/
+window {
+    transparency:     "real";
+    location:         center;
+    anchor:           center;
+    fullscreen:       false;
+    width:            680px;
+    border-radius:    12px;
+    background-color: @bg;
+    cursor:           "default";
+    border:           1px solid;
+    border-color:     @border-col;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    enabled:          true;
+    spacing:          0px;
+    padding:          0px;
+    background-color: transparent;
+    orientation:      vertical;
+    children:         [ "inputbar", "listbox" ];
+}
+
+listbox {
+    spacing:          8px;
+    padding:          8px 0px 0px 0px;
+    background-color: transparent;
+    orientation:      vertical;
+    children:         [ "message", "listview", "mode-switcher" ];
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    enabled:          true;
+    spacing:          8px;
+    padding:          11px 14px;
+    margin:           0px;
+    background-color: transparent;
+    orientation:      horizontal;
+    children:         [ "textbox-prompt-colon", "entry" ];
+    border:           0px 0px 1px 0px solid;
+    border-color:     @border-col;
+}
+
+textbox-prompt-colon {
+    enabled:          true;
+    expand:           false;
+    str:              "󰍉 ";
+    font:             "Google Sans Flex 14";
+    padding:          0px;
+    background-color: transparent;
+    text-color:       @accent;
+}
+
+entry {
+    enabled:           true;
+    background-color:  transparent;
+    text-color:        @fg;
+    cursor:            text;
+    vertical-align:    0.5;
+    placeholder:       "Type to search...";
+    placeholder-color: @fg-muted;
+}
+
+/*****----- Listview -----*****/
+listview {
+    enabled:          true;
+    columns:          1;
+    lines:            10;
+    cycle:            false;
+    dynamic:          true;
+    scrollbar:        false;
+    layout:           vertical;
+    reverse:          false;
+    fixed-height:     true;
+    fixed-columns:    true;
+    spacing:          3px;
+    padding:          0px 8px;
+    margin:           4px 0px;
+    background-color: transparent;
+    cursor:           "default";
+}
+
+/*****----- Elements -----*****/
+element {
+    enabled:          true;
+    spacing:          10px;
+    padding:          7px 10px;
+    border-radius:    8px;
+    background-color: transparent;
+    text-color:       @fg;
+    cursor:           pointer;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element normal.urgent,
+element alternate.urgent {
+    background-color: transparent;
+    text-color:       @urgent-col;
+}
+
+element normal.active,
+element alternate.active {
+    background-color: transparent;
+    text-color:       @accent;
+}
+
+element selected.normal {
+    background-color: @selected-bg;
+    text-color:       @on-primary;
+}
+
+element selected.urgent {
+    background-color: @bg-high;
+    text-color:       @urgent-col;
+}
+
+element selected.active {
+    background-color: @bg-high;
+    text-color:       @accent;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             32px;
+    cursor:           inherit;
+    vertical-align:   0.5;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    cursor:           inherit;
+    vertical-align:   0.5;
+    horizontal-align: 0.0;
+}
+
+/*****----- Mode Switcher -----*****/
+mode-switcher {
+    enabled:          true;
+    spacing:          0px;
+    padding:          0px;
+    background-color: transparent;
+    border:           1px 0px 0px 0px solid;
+    border-color:     @border-col;
+}
+
+button {
+    padding:          9px 12px;
+    border-radius:    0px;
+    background-color: transparent;
+    text-color:       @fg-muted;
+    cursor:           pointer;
+    horizontal-align: 0.5;
+}
+
+button selected {
+    background-color: transparent;
+    text-color:       @accent;
+    border:           0px 0px 2px 0px solid;
+    border-color:     @accent;
+}
+
+/*****----- Message -----*****/
+message {
+    background-color: transparent;
+    padding:          0px 8px;
+}
+
+textbox {
+    padding:          10px 14px;
+    border-radius:    8px;
+    border:           1px solid;
+    border-color:     @border-col;
+    background-color: @bg-panel;
+    text-color:       @fg-muted;
+    vertical-align:   0.5;
+    horizontal-align: 0.0;
+}
+
+error-message {
+    padding:          14px;
+    border-radius:    12px;
+    background-color: @bg-high;
+    text-color:       @urgent-col;
+}

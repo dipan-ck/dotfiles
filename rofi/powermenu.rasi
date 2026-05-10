@@ -16,10 +16,6 @@ configuration {
     urgent:         @error-container;
 }
 
-/*
-USE_BUTTONS=YES
-*/
-
 /*****----- Main Window -----*****/
 window {
     transparency:     "real";
@@ -47,57 +43,25 @@ mainbox {
     border-radius:    0px;
     border-color:     @selected;
     background-color: transparent;
-    children:         [ "inputbar", "listview", "message" ];
-}
-
-/*****----- Inputbar -----*****/
-inputbar {
-    enabled:          true;
-    spacing:          0px;
-    padding:          100px 40px;
-    background-color: transparent;
-    background-image: url("~/.config/rofi/current_wallpaper", width);
-    children:         [ "textbox-prompt-colon", "dummy", "prompt" ];
-}
-
-dummy {
-    background-color: transparent;
-}
-
-textbox-prompt-colon {
-    enabled:          true;
-    expand:           false;
-    str:              " System";
-    padding:          12px;
-    border-radius:    5px;
-    background-color: @urgent;
-    text-color:       @background;
-}
-
-prompt {
-    enabled:          true;
-    padding:          12px;
-    border-radius:    5px;
-    background-color: @active;
-    text-color:       @foreground;
+    children:         [ "listview", "message" ];
 }
 
 /*****----- Listview -----*****/
 listview {
-    enabled:       true;
-    columns:       3;
-    lines:         2;
-    cycle:         true;
-    dynamic:       true;
-    scrollbar:     false;
-    layout:        vertical;
-    reverse:       false;
-    fixed-height:  true;
-    fixed-columns: true;
-    spacing:       15px;
-    margin:        15px;
+    enabled:          true;
+    columns:          5;
+    lines:            1;
+    cycle:            true;
+    dynamic:          true;
+    scrollbar:        false;
+    layout:           vertical;
+    reverse:          false;
+    fixed-height:     true;
+    fixed-columns:    true;
+    spacing:          15px;
+    margin:           15px;
     background-color: transparent;
-    cursor:        "default";
+    cursor:           "default";
 }
 
 /*****----- Elements -----*****/
