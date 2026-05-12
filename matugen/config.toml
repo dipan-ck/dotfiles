@@ -1,7 +1,7 @@
 [config]
 [templates.kitty]
 input_path = '~/.config/matugen/templates/kitty-colors.conf'
-output_path = '~/.config/kitty/themes/Matugen.conf'
+output_path = '~/.config/kitty/colors.conf'
 post_hook = "kitty +kitten themes --reload-in=all Matugen"
 
 [templates.gtk3]

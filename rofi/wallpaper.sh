@@ -45,7 +45,7 @@ sat=$(convert "$chosen_path" \
 if (($(echo "$sat < 5.0" | bc -l))); then
   scheme="scheme-monochrome"
 else
-  scheme="scheme-fidelity"
+  scheme="scheme-tonal-spot"
 fi
 
 matugen image \
