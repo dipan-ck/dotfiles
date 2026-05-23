@@ -1,11 +1,10 @@
-/*****----- Configuration -----*****/
 configuration {
     modi:                "drun,filebrowser,window";
     show-icons:          true;
     icon-theme:          "Papirus-Dark";
-    display-drun:        "  Apps";
-    display-filebrowser: "  Files";
-    display-window:      "  Windows";
+    display-drun:        "Apps";
+    display-filebrowser: "Files";
+    display-window:      "Windows";
     drun-display-format: "{name}";
     window-format:       "{w} · {c} · {t}";
     terminal:            "kitty";
@@ -18,71 +17,54 @@ configuration {
 @import "colors.rasi"
 
 * {
-    font: "Google Sans Flex 10";
+    font:             "Google Sans Flex 11";
 
-    bg:           @surface;
-    bg-low:       @surface-container-lowest;
-    bg-panel:     @surface-container;
-    bg-high:      @surface-container-high;
+    bg:               @surface;
+    bg-low:           @surface-container-lowest;
+    bg-panel:         @surface-container;
+    bg-high:          @surface-container-high;
 
-    fg:           @on-surface;
-    fg-muted:     @on-surface-variant;
+    fg:               @on-surface;
+    fg-muted:         @on-surface-variant;
 
-    accent:       @primary;
-    selected-bg:  @primary;
-    selected-fg:  @on-primary-container;
+    accent:           @primary;
+    selected-bg:      @primary;
+    selected-fg:      @on-primary;
 
-    border-col:   @outline-variant;
-    urgent-col:   @error;
+    border-col:       @outline-variant;
+    urgent-col:       @error;
 
     background-color: transparent;
-    text-color:       @surface-container-lowest;
+    text-color:       @fg;
 }
 
 window {
     transparency:     "real";
     location:         center;
     anchor:           center;
-    width:            860px;
-    border-radius:    16px;
+    width:            620px;
+    border-radius:    20px;
+    border:           1px solid;
+    border-color:     @border-col;
     background-color: @bg;
     cursor:           "default";
+    padding:          0px;
 }
 
 mainbox {
     spacing:          0px;
-    padding:          0px;
-    orientation:      horizontal;
-    background-color: transparent;
-    children:         [ "imagebox", "listbox" ];
-}
-
-imagebox {
-    padding:          24px;
-    background-image: url("~/.config/rofi/current_wallpaper", height);
-    background-color: @bg-low;
-    border-radius:    16px 0px 0px 16px;
+    padding:          16px;
     orientation:      vertical;
-    width:            160px;
-    children:         [ "inputbar", "dummy", "mode-switcher" ];
-}
-
-dummy {
     background-color: transparent;
+    children:         [ "inputbar", "mode-switcher", "listbox" ];
 }
 
-listbox {
-    spacing:          10px;
-    padding:          18px;
-    background-color: transparent;
-    orientation:      vertical;
-    children:         [ "message", "listview" ];
-}
-
+/* ── Search ──────────────────────────────────────────────────────────── */
 inputbar {
-    spacing:          8px;
-    padding:          11px 14px;
-    border-radius:    10px;
+    spacing:          10px;
+    padding:          13px 16px;
+    margin:           0px 0px 10px 0px;
+    border-radius:    14px;
     border:           1px solid;
     border-color:     @border-col;
     background-color: @bg-panel;
@@ -92,72 +74,92 @@ inputbar {
 
 textbox-prompt-colon {
     expand:           false;
-    str:              "󰍉 ";
-    font:             "Google Sans Flex 13";
+    str:              "󰍉";
+    font:             "Google Sans Flex 16";
+    vertical-align:   0.5;
+    horizontal-align: 0.5;
     background-color: transparent;
     text-color:       @accent;
+    margin:           0px 4px 0px 0px;
 }
 
 entry {
     background-color:  transparent;
     text-color:        @fg;
     cursor:            text;
-    placeholder:       "Search...";
+    placeholder:       "Search apps, files, windows...";
     placeholder-color: @fg-muted;
+    vertical-align:    0.5;
 }
 
+/* ── Mode switcher ───────────────────────────────────────────────────── */
 mode-switcher {
     spacing:          6px;
+    margin:           0px 0px 10px 0px;
     background-color: transparent;
+    orientation:      horizontal;
 }
 
 button {
-    padding:          9px 12px;
-    border-radius:    8px;
+    padding:          7px 0px;
+    border-radius:    10px;
+    expand:           true;
     background-color: @bg-panel;
     text-color:       @fg-muted;
     cursor:           pointer;
+    horizontal-align: 0.5;
+    font:             "Google Sans Flex 10";
 }
 
 button selected {
     background-color: @selected-bg;
-    text-color:       @on-primary;
+    text-color:       @selected-fg;
+}
+
+/* ── List ────────────────────────────────────────────────────────────── */
+listbox {
+    spacing:          0px;
+    background-color: transparent;
+    orientation:      vertical;
+    children:         [ "message", "listview" ];
 }
 
 listview {
-    columns:       1;
-    lines:         9;
-    cycle:         true;
-    dynamic:       true;
-    scrollbar:     false;
-    layout:        vertical;
-    fixed-height:  true;
-    fixed-columns: true;
-    spacing:       3px;
+    columns:          1;
+    lines:            8;
+    cycle:            true;
+    dynamic:          true;
+    scrollbar:        false;
+    layout:           vertical;
+    fixed-height:     true;
+    fixed-columns:    true;
+    spacing:          2px;
     background-color: transparent;
-    cursor:        "default";
+    cursor:           "default";
 }
 
 element {
-    spacing:          10px;
-    padding:          7px 10px;
-    border-radius:    8px;
+    spacing:          12px;
+    padding:          9px 12px;
+    border-radius:    10px;
     background-color: transparent;
     text-color:       @fg;
     cursor:           pointer;
 }
 
-element selected.normal  { background-color: @primary; text-color: @on-primary; }
-element normal.urgent  { background-color: transparent; text-color: @urgent-col; }
-element normal.active  { background-color: transparent; text-color: @on-surface; }
-element selected.normal  { background-color: @primary; text-color: @on-primary; }
-element selected.urgent  { background-color: @selected-bg; text-color: @urgent-col; }
-element selected.active  { background-color: @selected-bg; text-color: @on-surface; }
+element normal.normal   { background-color: transparent;   text-color: @fg; }
+element normal.urgent   { background-color: transparent;   text-color: @urgent-col; }
+element normal.active   { background-color: transparent;   text-color: @fg; }
+element selected.normal { background-color: @selected-bg;  text-color: @selected-fg; }
+element selected.urgent { background-color: @selected-bg;  text-color: @urgent-col; }
+element selected.active { background-color: @selected-bg;  text-color: @selected-fg; }
+element alternate.normal { background-color: transparent;  text-color: @fg; }
 
 element-icon {
     background-color: transparent;
-    size:             32px;
+    size:             28px;
     cursor:           inherit;
+    vertical-align:   0.5;
 }
 
 element-text {
@@ -168,19 +170,20 @@ element-text {
     horizontal-align: 0.0;
 }
 
+/* ── Message / error ─────────────────────────────────────────────────── */
 message {
+    margin:           0px 0px 6px 0px;
     background-color: transparent;
 }
 
 textbox {
-    padding:          10px 14px;
-    border-radius:    8px;
-    border:           1px solid;
-    border-color:     @border-col;
+    padding:          9px 14px;
+    border-radius:    10px;
     background-color: @bg-panel;
     text-color:       @fg-muted;
     vertical-align:   0.5;
     horizontal-align: 0.0;
+    font:             "Google Sans Flex 10";
 }
 
 error-message {

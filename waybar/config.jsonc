@@ -154,7 +154,7 @@
   "custom/eye": {
     "exec": "bash ~/.config/waybar/scripts/eye-state.sh",
     "return-type": "json",
-    "interval": 1,
+    "interval": 4,
     "format": "{text}",
     "on-click-right": "bash ~/.config/waybar/scripts/eye-cycle.sh",
     "on-click": "bash ~/.config/waybar/scripts/eye-off.sh"
