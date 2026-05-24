@@ -1,0 +1,138 @@
+/* MACOS LAUNCHPAD LIKE THEME FOR ROFI */
+/* Author: Newman Sanchez (https://github.com/newmanls) */
+
+configuration {
+    modi:                "drun,filebrowser,window";
+    show-icons:          true;
+    icon-theme:          "Papirus-Dark";
+    display-drun:        "Apps";
+    display-filebrowser: "Files";
+    display-window:      "Windows";
+    drun-display-format: "{name}";
+    window-format:       "{w} · {c} · {t}";
+    terminal:            "kitty";
+    kb-mode-next:        "Tab";
+    kb-mode-previous:    "ISO_Left_Tab";
+    kb-element-next:     "";
+    kb-element-prev:     "";
+}
+
+@import "colors.rasi"
+
+* {
+    font:             "Google Sans Flex 11";
+
+    bg:               @surface;
+    bg-low:           @surface-container-lowest;
+    bg-panel:         @surface-container;
+    bg-high:          @surface-container-high;
+
+    fg:               @on-surface;
+    fg-muted:         @on-surface-variant;
+
+    accent:           @primary;
+    selected-bg:      @primary;
+    selected-fg:      @on-primary;
+
+    border-col:       @outline-variant;
+    urgent-col:       @error;
+
+    background-color: transparent;
+    text-color:       @fg;
+    padding:          0px;
+    margin:           0px;
+}
+
+window {
+    fullscreen:       true;
+    padding:          1em;
+    background-color: @bg-low;
+    transparency:     "real";
+}
+
+mainbox {
+    padding:          8px;
+    background-color: transparent;
+}
+
+inputbar {
+    background-color: @bg-panel;
+    margin:           0px calc(50% - 180px);
+    padding:          10px 14px;
+    spacing:          8px;
+    border:           1px solid;
+    border-radius:    12px;
+    border-color:     @border-col;
+    text-color:       @fg;
+    children:         [ "icon-search", "entry" ];
+}
+
+prompt {
+    enabled:          false;
+}
+
+icon-search {
+    expand:           false;
+    filename:         "search";
+    vertical-align:   0.5;
+}
+
+entry {
+    background-color:  transparent;
+    text-color:        @fg;
+    cursor:            text;
+    placeholder:       "Search apps...";
+    placeholder-color: @fg-muted;
+    vertical-align:    0.5;
+}
+
+listview {
+    margin:        48px calc(50% - 560px);
+    spacing:       48px;
+    columns:       6;
+    fixed-columns: true;
+    background-color: transparent;
+}
+
+element, element-text, element-icon {
+    cursor: pointer;
+}
+
+element {
+    padding:          8px;
+    spacing:          4px;
+    orientation:      vertical;
+    border-radius:    16px;
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element normal.normal   { background-color: transparent;  text-color: @fg; }
+element normal.urgent   { background-color: transparent;  text-color: @urgent-col; }
+element normal.active   { background-color: transparent;  text-color: @fg; }
+element selected.normal { background-color: @selected-bg; text-color: @selected-fg; }
+element selected.urgent { background-color: @selected-bg; text-color: @urgent-col; }
+element selected.active { background-color: @selected-bg; text-color: @selected-fg; }
+
+element-icon {
+    size:             64px;
+    horizontal-align: 0.5;
+    background-color: transparent;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    background-color: transparent;
+    text-color:       inherit;
+}
+
+message {
+    background-color: transparent;
+}
+
+error-message {
+    padding:          14px;
+    border-radius:    12px;
+    background-color: @bg-high;
+    text-color:       @urgent-col;
+}

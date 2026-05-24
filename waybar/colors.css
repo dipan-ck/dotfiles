@@ -5,41 +5,41 @@
    Output:   ~/.config/waybar/colors.css
    ============================================================ */
 
-@define-color primary          #f6b2e0;
-@define-color on-primary       #4e1e44;
-@define-color primary-container    #68355b;
-@define-color on-primary-container #ffd7ef;
+@define-color primary          #dfb8f7;
+@define-color on-primary       #412356;
+@define-color primary-container    #593a6f;
+@define-color on-primary-container #f3daff;
 
-@define-color secondary        #dcbed0;
-@define-color on-secondary     #3e2a38;
-@define-color secondary-container    #56404f;
-@define-color on-secondary-container #f9daec;
+@define-color secondary        #d2c1d9;
+@define-color on-secondary     #372c3f;
+@define-color secondary-container    #4f4256;
+@define-color on-secondary-container #efdcf5;
 
-@define-color tertiary         #f5b9a2;
-@define-color on-tertiary      #4b2717;
-@define-color tertiary-container    #663c2b;
-@define-color on-tertiary-container #ffdbce;
+@define-color tertiary         #f4b7ba;
+@define-color on-tertiary      #4c2528;
+@define-color tertiary-container    #663b3e;
+@define-color on-tertiary-container #ffdadb;
 
-@define-color surface          #181215;
-@define-color on-surface       #ecdfe5;
-@define-color surface-variant  #4f444a;
-@define-color on-surface-variant #d2c2ca;
+@define-color surface          #161217;
+@define-color on-surface       #e9e0e8;
+@define-color surface-variant  #4b454d;
+@define-color on-surface-variant #cdc3ce;
 
-@define-color surface-container-lowest  #120c10;
-@define-color surface-container-low     #201a1e;
-@define-color surface-container         #241e22;
-@define-color surface-container-high    #2f282c;
-@define-color surface-container-highest #3a3337;
+@define-color surface-container-lowest  #100d12;
+@define-color surface-container-low     #1e1a20;
+@define-color surface-container         #221e24;
+@define-color surface-container-high    #2d292e;
+@define-color surface-container-highest #383339;
 
-@define-color background       #181215;
-@define-color on-background    #ecdfe5;
+@define-color background       #161217;
+@define-color on-background    #e9e0e8;
 
 @define-color error            #ffb4ab;
 @define-color on-error         #690005;
 @define-color error-container  #93000a;
 
-@define-color outline          #9b8d94;
-@define-color outline-variant  #4f444a;
+@define-color outline          #968e98;
+@define-color outline-variant  #4b454d;
 
 @define-color shadow           #000000;
 @define-color scrim            #000000;
