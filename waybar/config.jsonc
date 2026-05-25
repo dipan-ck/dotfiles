@@ -7,8 +7,7 @@
   "gtk-layer-shell": true,
   "modules-left": [
     "custom/app-launcher",
-    "hyprland/workspaces",
-    "wlr/taskbar"
+    "hyprland/workspaces"
   ],
   "modules-center": [
     "mpris",
@@ -43,21 +42,6 @@
       "9": []
     }
   },
-  "wlr/taskbar": {
-    "format": "{icon}",
-    "icon-size": 18,
-    "tooltip-format": "{title}",
-    "on-click": "activate",
-    "on-click-middle": "close",
-    "ignore-list": [
-      "Alacritty",
-      "kitty"
-    ],
-    "rewrite": {
-      "Firefox Web Browser": "Firefox",
-      "Foot": "Terminal"
-    }
-  },
   "mpris": {
     "format": "{player_icon} {dynamic}",
     "format-paused": "{status_icon} <i>{dynamic}</i>",
@@ -71,9 +55,27 @@
     "on-click-middle": "playerctl previous"
   },
   "clock": {
-    "format": "{:%I:%M %p}",
-    "format-alt": "{:%R  %d·%m·%y}",
-    "tooltip-format": "<tt>{calendar}</tt>"
+    "format": "{:%I:%M %p  ·  %a, %d %b}",
+    "format-alt": "{:%H:%M  ·  %A, %d %B %Y}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "left",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#cdd6f4'><b>{}</b></span>",
+        "days": "<span color='#cdd6f4'>{}</span>",
+        "weeks": "<span color='#6c7086'><b>W{}</b></span>",
+        "weekdays": "<span color='#89b4fa'><b>{}</b></span>",
+        "today": "<span color='#f38ba8'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
   },
   "group/hardware": {
     "orientation": "horizontal",
@@ -103,31 +105,44 @@
   "group/connectivity": {
     "orientation": "horizontal",
     "modules": [
-      "network",
-      "bluetooth",
-      "pulseaudio",
-      "backlight",
-      "custom/eye"
+      "network"
     ]
   },
   "network": {
-    "format-wifi": "󰤨",
-    "format-ethernet": "󰈀",
+    "format-wifi": "󰤨 {essid}",
+    "format-ethernet": "󰈀 {ifname}",
     "format-disconnected": "󰤭",
-    "tooltip-format": "{essid} {signalStrength}%",
-    "tooltip-format-disconnected": "Disconnected",
+    "format-linked": "󰈀",
+    "max-length": 20,
+    "tooltip-format-wifi": "󰤨  {essid}\n󰈀  {ipaddr}\n󰜮  {signalStrength}%  {frequency}GHz",
+    "tooltip-format-ethernet": "󰈀  {ifname}\n󰈀  {ipaddr}\n  via {gwaddr}",
+    "tooltip-format-disconnected": "󰤭  Disconnected",
     "on-click": "kitty -e nmtui"
   },
+  "group/status-pill": {
+    "orientation": "horizontal",
+    "modules": [
+      "bluetooth",
+      "pulseaudio",
+      "backlight",
+      "custom/notification",
+      "battery"
+    ]
+  },
   "bluetooth": {
-    "format": "󰂯",
-    "format-connected": "󰂱",
-    "tooltip-format": "{controller_alias}\t{controller_address}",
-    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "format": "<span size='11pt'>󰂯</span>",
+    "format-connected": "<span size='13pt'>󰂱</span>",
+    "format-disabled": "<span size='13pt'>󰂲</span>",
+    "max-length": 20,
+    "tooltip-format": "󰂯  {controller_alias}\n  {controller_address}",
+    "tooltip-format-connected": "󰂱  {controller_alias}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "  {device_alias}  {device_address}",
+    "tooltip-format-enumerate-connected-battery": "  {device_alias}  {device_address}  󰁹{device_battery_percentage}%",
     "on-click": "blueman-manager"
   },
   "pulseaudio": {
-    "format": "{icon} {volume}",
+    "format": "<span size='10pt'>{icon}</span> {volume}",
+    "format-muted": "<span size='13pt'>󰝟</span> muted",
     "format-icons": {
       "default": [
         "󰕿",
@@ -135,13 +150,15 @@
         "󰕾"
       ]
     },
-    "on-click": "pavucontrol",
+    "tooltip-format": "  {desc}\n  {volume}%",
+    "on-click": "wpctl set-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "pavucontrol",
     "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +2%",
     "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -2%"
   },
   "backlight": {
     "device": "amdgpu_bl1",
-    "format": "{icon} {percent}",
+    "format": "<span size='10pt'>{icon}</span> {percent}",
     "format-icons": [
       "󰃞",
       "󰃟",
@@ -149,28 +166,12 @@
     ],
     "on-scroll-up": "brightnessctl -d amdgpu_bl1 set +2%",
     "on-scroll-down": "brightnessctl -d amdgpu_bl1 set 2%-",
-    "tooltip-format": "Brightness: {percent}%"
-  },
-  "custom/eye": {
-    "exec": "bash ~/.config/waybar/scripts/eye-state.sh",
-    "return-type": "json",
-    "interval": 4,
-    "format": "{text}",
-    "on-click-right": "bash ~/.config/waybar/scripts/eye-cycle.sh",
-    "on-click": "bash ~/.config/waybar/scripts/eye-off.sh"
-  },
-  "group/status-pill": {
-    "orientation": "horizontal",
-    "modules": [
-      "custom/notification",
-      "battery",
-      "custom/power"
-    ]
+    "tooltip-format": "󰃠  Brightness: {percent}%"
   },
   "custom/notification": {
     "exec": "swaync-client -swb",
     "return-type": "json",
-    "format": "{icon}",
+    "format": "<span size='13pt'>{icon}</span>",
     "format-icons": {
       "notification": "󰂚",
       "none": "󰂜",
@@ -187,11 +188,15 @@
   },
   "battery": {
     "states": {
+      "good": 80,
       "warning": 30,
       "critical": 15
     },
-    "format": "{icon} {capacity}",
-    "format-charging": "󰂄 {capacity}",
+    "format": "<span size='10pt'>{icon}</span> {capacity}%",
+    "format-charging": "<span size='10pt'>󰂄</span> {capacity}%",
+    "format-plugged": "<span size='10pt'>󰚥</span> {capacity}%",
+    "format-full": "<span size='10pt'>󰁹</span> {capacity}%",
+    "tooltip-format": "  {timeTo}\n  {power}W",
     "format-icons": [
       "󰂎",
       "󰁺",
@@ -205,11 +210,6 @@
       "󰂂",
       "󰁹"
     ]
-  },
-  "custom/power": {
-    "format": "󰐥",
-    "tooltip": false,
-    "on-click": "bash ~/.config/rofi/powermenu.sh"
   },
   "tray": {
     "icon-size": 18,

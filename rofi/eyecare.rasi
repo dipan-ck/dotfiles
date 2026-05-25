@@ -1,27 +1,21 @@
 configuration {
     show-icons: false;
 }
-
 @import "colors.rasi"
 
 * {
     font:             "JetBrainsMono Nerd Font Mono 11";
-
     bg:               @surface;
     bg-low:           @surface-container-lowest;
     bg-panel:         @surface-container;
     bg-high:          @surface-container-high;
-
     fg:               @on-surface;
     fg-muted:         @on-surface-variant;
-
     accent:           @primary;
     selected-bg:      @primary;
     selected-fg:      @on-primary;
-
     border-col:       @outline-variant;
     urgent-col:       @error;
-
     background-color: transparent;
     text-color:       @fg;
 }
@@ -47,7 +41,6 @@ mainbox {
     children:         [ "inputbar", "message", "listview" ];
 }
 
-/* ── Header / prompt bar ─────────────────────────────────────────────── */
 inputbar {
     spacing:          10px;
     padding:          13px 16px;
@@ -61,8 +54,8 @@ inputbar {
 
 textbox-prompt-colon {
     expand:           false;
-    str:              "󰐥";
-    font:             "JetBrainsMono Nerd Font Mono 12";
+    str:              "󱩌";
+    font:             "JetBrainsMono Nerd Font Mono 14";
     vertical-align:   0.5;
     horizontal-align: 0.5;
     background-color: transparent;
@@ -74,10 +67,9 @@ prompt {
     background-color: transparent;
     text-color:       @fg;
     vertical-align:   0.5;
-    font:              "JetBrainsMono Nerd Font Mono 12";
+    font:             "JetBrainsMono Nerd Font Mono 10";
 }
 
-/* ── Uptime message ──────────────────────────────────────────────────── */
 message {
     margin:           0px 0px 10px 0px;
     background-color: transparent;
@@ -90,13 +82,12 @@ textbox {
     text-color:       @fg-muted;
     vertical-align:   0.5;
     horizontal-align: 0.0;
-    font:               "JetBrainsMono Nerd Font Mono 10";
+    font:             "JetBrainsMono Nerd Font Mono 10";
 }
 
-/* ── List ────────────────────────────────────────────────────────────── */
 listview {
     columns:          1;
-    lines:            6;
+    lines:            4;
     cycle:            true;
     dynamic:          true;
     scrollbar:        false;
@@ -117,10 +108,10 @@ element {
     cursor:           pointer;
 }
 
-element normal.normal   { background-color: transparent;  text-color: @fg; }
-element normal.urgent   { background-color: transparent;  text-color: @urgent-col; }
+element normal.normal   { background-color: transparent;        text-color: @fg; }
+element normal.urgent   { background-color: transparent;        text-color: @urgent-col; }
 element selected.normal { background-color: @primary-container; text-color: @on-primary-container; }
-element selected.urgent { background-color: @urgent-col;  text-color: @bg; }
+element selected.urgent { background-color: @urgent-col;        text-color: @bg; }
 
 element-text {
     background-color: transparent;

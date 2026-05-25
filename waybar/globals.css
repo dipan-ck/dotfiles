@@ -1,5 +1,4 @@
 @import "colors.css";
-
 * {
     font-family: "JetBrainsMono Nerd Font", sans-serif;
     font-size: 12px;
@@ -9,11 +8,9 @@
     min-height: 0;
     transition: all 150ms ease;
 }
-
 window#waybar {
     background-color: @surface-container-lowest;
 }
-
 /* ── Shared pill base ── */
 #custom-app-launcher,
 #workspaces,
@@ -24,22 +21,18 @@ window#waybar {
 #connectivity,
 #status-pill,
 #tray {
-    background-color: @surface-container-low;
+    background-color: @surface-container-lowest;
     color: @on-surface;
     padding: 0 10px;
     margin: 3px 3px;
     border-radius: 999px;
     min-height: 0;
 }
-
 /* ── App Launcher ── */
 #custom-app-launcher {
     font-size: 16px;
     padding: 0 14px;
 }
-#custom-app-launcher:hover {
-}
-
 /* ── Workspaces ── */
 #workspaces {
     padding: 0 4px;
@@ -65,12 +58,10 @@ window#waybar {
     background-color: @error-container;
     color: @error;
 }
-
 /* ── Taskbar ── */
 #taskbar {
     padding: 0 6px;
 }
-
 /* ── Clock & MPRIS ── */
 #clock {
     color: @on-surface;
@@ -83,7 +74,6 @@ window#waybar {
     color: @primary;
     min-width: 220px;
 }
-
 /* ── Hardware pill internals ── */
 #cpu, #memory, #custom-gpu {
     padding: 0 7px;
@@ -92,7 +82,6 @@ window#waybar {
 #cpu:hover, #memory:hover, #custom-gpu:hover {
     color: @primary;
 }
-
 /* ── Connectivity pill internals ── */
 #network, #bluetooth, #pulseaudio, #backlight, #custom-eye {
     padding: 0 7px;
@@ -101,13 +90,19 @@ window#waybar {
 #network:hover, #bluetooth:hover, #pulseaudio:hover, #backlight:hover {
     color: @primary;
 }
-#network.disconnected {
+/* ── Network states ── */
+#network.wifi,
+#network.ethernet {
+    color: @primary;
+}
+#network.disconnected,
+#network.disabled {
     color: @error;
 }
+/* ── Bluetooth states ── */
 #bluetooth.connected {
     color: @primary;
 }
-
 /* ── Eye care states ── */
 #custom-eye {
     color: @on-surface-variant;
@@ -116,7 +111,6 @@ window#waybar {
 #custom-eye.warmer { color: #ff9944; }
 #custom-eye.hot    { color: #ff6622; }
 #custom-eye:hover  { color: @primary; }
-
 /* ── Status pill internals ── */
 #custom-notification, #battery, #custom-power {
     padding: 0 7px;
@@ -132,7 +126,6 @@ window#waybar {
     color: @on-surface-variant;
     opacity: 0.6;
 }
-
 #battery {
     color: @on-surface-variant;
 }
@@ -146,7 +139,6 @@ window#waybar {
     color: @error;
     animation: blink 0.5s ease-in-out infinite alternate;
 }
-
 #custom-power {
     color: @error;
     padding-left: 4px;
@@ -156,7 +148,6 @@ window#waybar {
     background-color: @error;
     border-radius: 999px;
 }
-
 /* ── Tray ── */
 #tray {
     padding: 0 8px;
@@ -170,7 +161,6 @@ window#waybar {
     background-color: @error-container;
     border-radius: 999px;
 }
-
 /* ── Blink animation ── */
 @keyframes blink {
     to { opacity: 0.4; }

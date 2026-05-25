@@ -2,4 +2,4 @@
 
 rofi \
   -show drun \
-  -theme "$HOME/.config/rofi/launcher/theme2.rasi"
+  -theme "$HOME/.config/rofi/launchers/theme5.rasi"

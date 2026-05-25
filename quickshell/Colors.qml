@@ -1,4 +1,5 @@
 
+
 pragma Singleton
 
 import QtQuick
@@ -211,4 +212,3 @@ Singleton {
 		property string base0f: "transparent"
 	}
 }
-
