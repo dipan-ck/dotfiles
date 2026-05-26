@@ -13,7 +13,7 @@ configuration {
 @import "colors.rasi"
 
 * {
-    font:             "Google Sans Flex 11";
+    font:             "JetBrainsMono Nerd Font Mono 11";
     bg:               @surface;
     bg-low:           @surface-container-lowest;
     bg-panel:         @surface-container;
@@ -33,9 +33,9 @@ window {
     transparency:     "real";
     location:         center;
     anchor:           center;
-    width:            1140px;
-    height:           580px;
-    border-radius:    24px;
+    width:            1320px;
+    height:           700px;
+    border-radius:    20px;
     border:           1px solid;
     border-color:     @border-col;
     background-color: @bg;
@@ -45,7 +45,7 @@ window {
 
 mainbox {
     spacing:          0px;
-    padding:          20px;
+    padding:          16px;
     orientation:      vertical;
     background-color: transparent;
     children:         [ "inputbar", "message", "listview" ];
@@ -53,10 +53,10 @@ mainbox {
 
 /* ── Search bar ─────────────────────────────────────────────────────── */
 inputbar {
-    spacing:          10px;
-    padding:          12px 16px;
-    margin:           0px 0px 16px 0px;
-    border-radius:    14px;
+    spacing:          8px;
+    padding:          10px 14px;
+    margin:           0px 0px 12px 0px;
+    border-radius:    12px;
     border:           1px solid;
     border-color:     @border-col;
     background-color: @bg-panel;
@@ -67,7 +67,7 @@ inputbar {
 textbox-prompt-colon {
     expand:           false;
     str:              "󰸉";
-    font:             "Google Sans Flex 15";
+    font:             "JetBrainsMono Nerd Font Mono 15";
     vertical-align:   0.5;
     horizontal-align: 0.5;
     background-color: transparent;
@@ -89,7 +89,7 @@ num-filtered-rows {
     expand:           false;
     background-color: transparent;
     text-color:       @fg-muted;
-    font:             "Google Sans Flex 10";
+    font:             "JetBrainsMono Nerd Font Mono 10";
     vertical-align:   0.5;
 }
 
@@ -98,7 +98,7 @@ textbox-slash {
     str:              "/";
     background-color: transparent;
     text-color:       @fg-muted;
-    font:             "Google Sans Flex 10";
+    font:             "JetBrainsMono Nerd Font Mono 10";
     vertical-align:   0.5;
 }
 
@@ -106,21 +106,21 @@ num-rows {
     expand:           false;
     background-color: transparent;
     text-color:       @fg-muted;
-    font:             "Google Sans Flex 10";
+    font:             "JetBrainsMono Nerd Font Mono 10";
     vertical-align:   0.5;
 }
 
 /* ── Grid ───────────────────────────────────────────────────────────── */
 listview {
-    columns:          5;
-    lines:            1;
+    columns:          6;
+    lines:            5;
     cycle:            true;
     dynamic:          true;
     scrollbar:        false;
     layout:           vertical;
     fixed-height:     true;
     fixed-columns:    true;
-    spacing:          12px;
+    spacing:          8px;
     background-color: transparent;
     cursor:           "default";
 }
@@ -129,9 +129,9 @@ listview {
 element {
     orientation:      vertical;
     spacing:          0px;
-    padding:          6px;
-    border-radius:    16px;
-    border:           2px solid;
+    padding:          4px;
+    border-radius:    12px;
+    border:           1px solid;
     border-color:     transparent;
     background-color: @bg-panel;
     cursor:           pointer;
@@ -153,8 +153,8 @@ element selected.normal {
 }
 
 element-icon {
-    size:             200px;
-    border-radius:    12px;
+    size:             175px;
+    border-radius:    10px;
     background-color: @bg-low;
     cursor:           inherit;
     vertical-align:   0.5;
@@ -166,15 +166,15 @@ element-text {
     background-color: transparent;
     text-color:       transparent;
     cursor:           inherit;
-    font:             "Google Sans Flex 1";
+    font:             "JetBrainsMono Nerd Font Mono 1";
     str:              "";
 }
 
 /* ── Status bar ─────────────────────────────────────────────────────── */
 message {
-    margin:           0px 0px 12px 0px;
-    padding:          8px 14px;
-    border-radius:    10px;
+    margin:           0px 0px 10px 0px;
+    padding:          6px 12px;
+    border-radius:    8px;
     background-color: @bg-panel;
     text-color:       @fg-muted;
 }
@@ -182,14 +182,14 @@ message {
 textbox {
     background-color: transparent;
     text-color:       @fg-muted;
-    font:             "Google Sans Flex 10";
+    font:             "JetBrainsMono Nerd Font Mono 10";
     vertical-align:   0.5;
     horizontal-align: 0.0;
 }
 
 error-message {
-    padding:          14px;
-    border-radius:    12px;
+    padding:          12px;
+    border-radius:    10px;
     background-color: @bg-high;
     text-color:       @urgent-col;
 }

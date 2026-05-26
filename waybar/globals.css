@@ -64,6 +64,7 @@ window#waybar {
 }
 /* ── Clock & MPRIS ── */
 #clock {
+  background-color: @surface-container-low;
     color: @on-surface;
     letter-spacing: 0.5px;
 }

@@ -4,7 +4,7 @@ WALL_DIR="$HOME/.config/wall"
 ROFI_THEME="$HOME/.config/rofi/wallpaper.rasi"
 ROFI_CACHE="$HOME/.config/rofi/current_wallpaper"
 
-# Build the list of wallpapers as display entries with icon paths
+# Build the list of wallpapers as display entries with icon pathwallpaps
 wall_list=""
 while IFS= read -r -d '' file; do
   name=$(basename "$file")
@@ -45,7 +45,7 @@ sat=$(convert "$chosen_path" \
 if (($(echo "$sat < 5.0" | bc -l))); then
   scheme="scheme-monochrome"
 else
-  scheme="scheme-tonal-spot"
+  scheme="scheme-content"
 fi
 
 matugen image \

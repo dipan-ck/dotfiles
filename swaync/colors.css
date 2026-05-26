@@ -1,12 +1,12 @@
 /* Matugen generated colors for SwayNC */
-@define-color text #dfe3e7;
-@define-color text-alt #c0c8cd;
-@define-color selected #8ccff0;
-@define-color hover #262b2e;
+@define-color text #e4e2e1;
+@define-color text-alt #c3c7c5;
+@define-color selected #bfc9c5;
+@define-color hover #2a2a2a;
 @define-color urgent #ffb4ab;
 /* Backgrounds */
-@define-color background #0f1417;
-@define-color background-alt #1b2023;
-@define-color notification-bg #171c1f;
-@define-color center-bg #171c1f;
-@define-color center-notification-bg #1b2023;
+@define-color background #131313;
+@define-color background-alt #1f201f;
+@define-color notification-bg #1b1c1b;
+@define-color center-bg #1b1c1b;
+@define-color center-notification-bg #1f201f;

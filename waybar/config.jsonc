@@ -7,10 +7,10 @@
   "gtk-layer-shell": true,
   "modules-left": [
     "custom/app-launcher",
-    "hyprland/workspaces"
+    "hyprland/workspaces",
+    "mpris"
   ],
   "modules-center": [
-    "mpris",
     "clock"
   ],
   "modules-right": [
@@ -125,7 +125,6 @@
       "bluetooth",
       "pulseaudio",
       "backlight",
-      "custom/notification",
       "battery"
     ]
   },
@@ -141,7 +140,7 @@
     "on-click": "blueman-manager"
   },
   "pulseaudio": {
-    "format": "<span size='10pt'>{icon}</span> {volume}",
+    "format": "<span size='12pt'>{icon}</span> {volume}",
     "format-muted": "<span size='13pt'>󰝟</span> muted",
     "format-icons": {
       "default": [
@@ -167,24 +166,6 @@
     "on-scroll-up": "brightnessctl -d amdgpu_bl1 set +2%",
     "on-scroll-down": "brightnessctl -d amdgpu_bl1 set 2%-",
     "tooltip-format": "󰃠  Brightness: {percent}%"
-  },
-  "custom/notification": {
-    "exec": "swaync-client -swb",
-    "return-type": "json",
-    "format": "<span size='13pt'>{icon}</span>",
-    "format-icons": {
-      "notification": "󰂚",
-      "none": "󰂜",
-      "dnd-notification": "󰂛",
-      "dnd-none": "󰪑",
-      "inhibited-notification": "󰂚",
-      "inhibited-none": "󰂜",
-      "dnd-inhibited-notification": "󰂛",
-      "dnd-inhibited-none": "󰪑"
-    },
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
-    "escape": true
   },
   "battery": {
     "states": {

@@ -111,7 +111,7 @@ button {
 
 button selected {
     background-color: @primary-container;
-    text-color:       @primary;
+    text-color:       @on-primary;
 }
 
 listbox {
@@ -147,7 +147,7 @@ element {
 element normal.normal    { background-color: transparent;  text-color: @fg; }
 element normal.urgent    { background-color: transparent;  text-color: @urgent-col; }
 element normal.active    { background-color: transparent;  text-color: @fg; }
-element selected.normal  { background-color: @primary-container; text-color: @fg; }
+element selected.normal  { background-color: @primary-container; text-color: @on-primary; }
 element selected.urgent  { background-color: @selected-bg; text-color: @urgent-col; }
 element selected.active  { background-color: @selected-bg; text-color: @selected-fg; }
 element alternate.normal { background-color: transparent;  text-color: @fg; }
