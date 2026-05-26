@@ -14,90 +14,85 @@ PanelWindow {
     id: bar
     anchors { top: true; left: true; right: true }
     implicitHeight: 40
-    color: Colors.md3.surface
+    color: Colors.md3.surface_container_lowest
 
+    // ── System stats (bar pills only — lightweight) ───────────────
     property int  cpuUsage: 0
     property int  ramUsage: 0
     property int  gpuUsage: 0
     property real lastCpuTotal: 0
-    property real lastCpuIdle: 0
+    property real lastCpuIdle:  0
 
+    // Brightness
     property int brightnessVal: 50
     property int brightnessMax: 100
 
-    // ── Pipewire binding — required for volume/mute to work ───────
+    // ── Pipewire binding ──────────────────────────────────────────
     PwObjectTracker {
         objects: [Pipewire.defaultAudioSink]
     }
 
-    property var  pwSink:  Pipewire.defaultAudioSink
-    property var  pwAudio: pwSink ? pwSink.audio : null
-    property real volPct:  pwAudio ? Math.round(pwAudio.volume * 100) : 0
+    property var  pwSink:   Pipewire.defaultAudioSink
+    property var  pwAudio:  pwSink ? pwSink.audio : null
+    property real volPct:   pwAudio ? Math.round(pwAudio.volume * 100) : 0
     property bool volMuted: pwAudio ? pwAudio.muted : false
 
-    // ── Processes ─────────────────────────────────────────────────
+    // ── SINGLE consolidated process for bar stats ─────────────────
+    // Reads cpu summary, free memory, and gpu busy in one shell call.
+    // Much cheaper than 3 separate Process objects firing every 2s.
     Process {
-        id: cpuProc
-        command: ["sh", "-c", "head -1 /proc/stat"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data) return
-                var p     = data.trim().split(/\s+/)
-                var idle  = parseInt(p[4]) + parseInt(p[5])
-                var total = p.slice(1, 8).reduce((a, b) => a + parseInt(b), 0)
-                if (bar.lastCpuTotal > 0) {
-                    var dt = total - bar.lastCpuTotal
-                    var di = idle  - bar.lastCpuIdle
-                    bar.cpuUsage = Math.round(100 * (1 - di / dt))
+        id: barStatsProc
+        command: ["sh", "-c", [
+            "head -1 /proc/stat | awk '{printf \"CPU %s %s %s %s %s %s %s %s\\n\",$2,$3,$4,$5,$6,$7,$8,$9}';",
+            "awk '/^MemTotal/{t=$2} /^MemAvailable/{a=$2} END{printf \"MEM %d %d\\n\",t,a}' /proc/meminfo;",
+            "printf 'GPU %s\\n' \"$(cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0)\""
+        ].join(" ")]
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var lines = this.text.trim().split("\n")
+                for (var i = 0; i < lines.length; i++) {
+                    var parts = lines[i].trim().split(/\s+/)
+                    if (!parts[0]) continue
+
+                    if (parts[0] === "CPU") {
+                        var idle  = parseInt(parts[4]) + parseInt(parts[5])
+                        var total = 0
+                        for (var j = 1; j <= 7; j++) total += parseInt(parts[j])
+                        if (bar.lastCpuTotal > 0) {
+                            var dt = total - bar.lastCpuTotal
+                            var di = idle  - bar.lastCpuIdle
+                            if (dt > 0)
+                                bar.cpuUsage = Math.max(0, Math.min(100, Math.round(100 * (1 - di / dt))))
+                        }
+                        bar.lastCpuTotal = total
+                        bar.lastCpuIdle  = idle
+
+                    } else if (parts[0] === "MEM") {
+                        var mtotal = parseInt(parts[1]) || 1
+                        var mavail = parseInt(parts[2]) || 0
+                        bar.ramUsage = Math.round(100 * (mtotal - mavail) / mtotal)
+
+                    } else if (parts[0] === "GPU") {
+                        bar.gpuUsage = parseInt(parts[1]) || 0
+                    }
                 }
-                bar.lastCpuTotal = total
-                bar.lastCpuIdle  = idle
             }
         }
-        Component.onCompleted: running = true
     }
 
-    Process {
-        id: ramProc
-        command: ["sh", "-c", "free | grep Mem"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data) return
-                var parts = data.trim().split(/\s+/)
-                var total = parseInt(parts[1]) || 1
-                var used  = parseInt(parts[2]) || 0
-                bar.ramUsage = Math.round(100 * used / total)
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
-    Process {
-        id: gpuProc
-        command: ["sh", "-c", "cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null || echo 0"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data) return
-                bar.gpuUsage = parseInt(data.trim()) || 0
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
+    // Brightness — read once at startup
     Process {
         id: brightnessGetProc
-        command: ["sh", "-c", "brightnessctl get"]
-        stdout: SplitParser {
-            onRead: data => { if (data.trim()) bar.brightnessVal = parseInt(data.trim()) || 0 }
-        }
-        Component.onCompleted: running = true
-    }
-
-    Process {
-        id: brightnessMaxProc
-        command: ["sh", "-c", "brightnessctl max"]
-        stdout: SplitParser {
-            onRead: data => { if (data.trim()) bar.brightnessMax = parseInt(data.trim()) || 100 }
+        command: ["sh", "-c", "brightnessctl get && brightnessctl max"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var lines = this.text.trim().split("\n")
+                if (lines.length >= 2) {
+                    bar.brightnessVal = parseInt(lines[0]) || 0
+                    bar.brightnessMax = parseInt(lines[1]) || 100
+                }
+            }
         }
         Component.onCompleted: running = true
     }
@@ -109,33 +104,46 @@ PanelWindow {
         onRunningChanged: if (!running) brightnessGetProc.running = true
     }
 
-    Process {
-        id: nmtuiProc
-        command: ["kitty", "-e", "nmtui"]
-    }
+    Process { id: nmtuiProc;      command: ["kitty", "-e", "nmtui"] }
+    Process { id: bluemanProc;    command: ["blueman-manager"] }
+    Process { id: pwvucontrolProc; command: ["pavucontrol"] }
 
-    Process {
-        id: bluemanProc
-        command: ["blueman-manager"]
-      }
-
-Process {
-    id: pwvucontrolProc
-    command: ["pavucontrol"]
-}
-
+    // ── Poll bar stats every 2s ───────────────────────────────────
     Timer {
         interval: 2000
         running: true
         repeat: true
-        onTriggered: {
-            cpuProc.running = true
-            ramProc.running = true
-            gpuProc.running = true
+        triggeredOnStart: true
+        onTriggered: barStatsProc.running = true
+    }
+
+    // ── Resource popup — LazyLoader: only creates Resource when first opened ──
+    PopupWindow {
+        id: resourcePopupWindow
+        color: "transparent"
+        visible: false
+        anchor {
+            window: bar
+            rect.x: bar.width - 580
+            rect.y: bar.implicitHeight + 4
+            rect.width: 300
+            rect.height: 1
+            edges: Edges.Top | Edges.Left
+            gravity: Edges.Bottom | Edges.Right
+        }
+        implicitWidth: 350
+        implicitHeight: resourceLoader.item ? resourceLoader.item.height : 1
+
+        Loader {
+            id: resourceLoader
+            anchors.fill: parent
+            // Only load the component the first time the popup opens
+            source: resourcePopupWindow.visible ? "Resource.qml" : ""
+            active: resourcePopupWindow.visible
         }
     }
 
-    // ── Calendar popup ────────────────────────────────────────────
+    // ── Calendar popup — LazyLoader ───────────────────────────────
     PopupWindow {
         id: calendarPopup
         color: "transparent"
@@ -149,12 +157,18 @@ Process {
             edges: Edges.Top | Edges.Left
             gravity: Edges.Bottom | Edges.Right
         }
-        Calendar { id: cal; anchors.fill: parent }
         implicitWidth: 280
-        implicitHeight: cal.height
+        implicitHeight: calendarLoader.item ? calendarLoader.item.height : 1
+
+        Loader {
+            id: calendarLoader
+            anchors.fill: parent
+            source: calendarPopup.visible ? "Calendar.qml" : ""
+            active: calendarPopup.visible
+        }
     }
 
-    // ── Battery popup ─────────────────────────────────────────────
+    // ── Battery popup — LazyLoader ────────────────────────────────
     PopupWindow {
         id: batteryPopupWindow
         color: "transparent"
@@ -168,42 +182,55 @@ Process {
             edges: Edges.Top | Edges.Left
             gravity: Edges.Bottom | Edges.Right
         }
-        Battery { id: bat; anchors.fill: parent }
         implicitWidth: 280
-        implicitHeight: bat.height
-      }
+        implicitHeight: batteryLoader.item ? batteryLoader.item.height : 1
 
-PopupWindow {
-    id: playerPopupWindow
-    color: "transparent"
-    visible: false
-    anchor {
-        window: bar
-      rect.x: (bar.width - 280) / 8
-            rect.y: bar.implicitHeight + 4
-        rect.width: 380
-        rect.height: 1
-        edges: Edges.Top | Edges.Left
-        gravity: Edges.Bottom | Edges.Right
+        Loader {
+            id: batteryLoader
+            anchors.fill: parent
+            source: batteryPopupWindow.visible ? "Battery.qml" : ""
+            active: batteryPopupWindow.visible
+        }
     }
-    Player { id: playerWidget; anchors.fill: parent }
-    implicitWidth: 480
-    implicitHeight: playerWidget.height
-}
+
+    // ── Player popup — LazyLoader ─────────────────────────────────
+    PopupWindow {
+        id: playerPopupWindow
+        color: "transparent"
+        visible: false
+        anchor {
+            window: bar
+            rect.x: (bar.width - 280) / 8
+            rect.y: bar.implicitHeight + 4
+            rect.width: 380
+            rect.height: 1
+            edges: Edges.Top | Edges.Left
+            gravity: Edges.Bottom | Edges.Right
+        }
+        implicitWidth: 480
+        implicitHeight: playerLoader.item ? playerLoader.item.height : 1
+
+        Loader {
+            id: playerLoader
+            anchors.fill: parent
+            source: playerPopupWindow.visible ? "Player.qml" : ""
+            active: playerPopupWindow.visible
+        }
+    }
 
     // ── Bar content ───────────────────────────────────────────────
     Rectangle {
         anchors.fill: parent
         color: "transparent"
 
-        // ── Left — logo + workspaces ──────────────────────────────
+        // ── Left — logo + workspaces + media ─────────────────────
         Row {
             anchors { left: parent.left; leftMargin: 8; verticalCenter: parent.verticalCenter }
             spacing: 6
 
             Rectangle {
                 width: 36; height: 28; radius: 14
-                color: Colors.md3.surface
+                color: Colors.md3.surface_container_lowest
                 Text {
                     anchors.centerIn: parent
                     text: "󰣇"
@@ -213,11 +240,12 @@ PopupWindow {
                 }
             }
 
+            // Workspaces
             Rectangle {
                 height: 28
                 width: workspaceRow.width + 8
                 radius: 14
-                color: Colors.md3.surface
+                color: Colors.md3.surface_container_lowest
 
                 Row {
                     id: workspaceRow
@@ -256,56 +284,56 @@ PopupWindow {
                         }
                     }
                 }
-              }
-
-// ── Media pill ────────────────────────────────────────────
-Rectangle {
-    id: mediaPill
-    height: 28
-    width: mediaRow.width + 16
-    radius: 14
-    color: playerPopupWindow.visible ? Colors.md3.surface_container_high : Colors.md3.surface
-    visible: Mpris.players.values.length > 0
-    Behavior on color { ColorAnimation { duration: 150 } }
-    Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-    Row {
-        id: mediaRow
-        anchors.centerIn: parent
-        spacing: 6
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: {
-                var p = Mpris.players.values[0]
-                if (!p) return ""
-                return p.isPlaying ? "" : ""
             }
-            font.family: "JetBrainsMono Nerd Font Mono"
-            font.pixelSize: 20
-            color: Colors.md3.primary
-        }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: {
-                var p = Mpris.players.values[0]
-                if (!p) return ""
-                var title = p.trackTitle || ""
-                return title.length > 32 ? title.substring(0, 32) + "…" : title
+            // Media pill
+            Rectangle {
+                id: mediaPill
+                height: 28
+                width: mediaRow.width + 16
+                radius: 14
+                color: playerPopupWindow.visible ? Colors.md3.surface_container_high : Colors.md3.surface_container_lowest
+                visible: Mpris.players.values.length > 0
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+                Row {
+                    id: mediaRow
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: {
+                            var p = Mpris.players.values[0]
+                            if (!p) return ""
+                            return p.isPlaying ? "" : ""
+                        }
+                        font.family: "JetBrainsMono Nerd Font Mono"
+                        font.pixelSize: 20
+                        color: Colors.md3.primary
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: {
+                            var p = Mpris.players.values[0]
+                            if (!p) return ""
+                            var title = p.trackTitle || ""
+                            return title.length > 32 ? title.substring(0, 32) + "…" : title
+                        }
+                        font.family: "JetBrainsMono Nerd Font Mono"
+                        font.pixelSize: 13
+                        color: Colors.md3.primary
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: playerPopupWindow.visible = !playerPopupWindow.visible
+                }
             }
-            font.family: "JetBrainsMono Nerd Font Mono"
-            font.pixelSize: 13
-            color: Colors.md3.primary
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        onClicked: playerPopupWindow.visible = !playerPopupWindow.visible
-    }
-}
         }
 
         // ── Center — clock ────────────────────────────────────────
@@ -315,7 +343,7 @@ Rectangle {
             height: 28
             width: clockRow.width + 20
             radius: 14
-            color: calendarPopup.visible ? Colors.md3.surface_container_high : Colors.md3.surface
+            color: calendarPopup.visible ? Colors.md3.surface_container_high : Colors.md3.surface_container_lowest
             Behavior on color { ColorAnimation { duration: 150 } }
 
             Row {
@@ -346,13 +374,15 @@ Rectangle {
                 }
             }
 
+            // Use Quickshell's SystemClock if available, else fallback timer
             Timer {
                 interval: 1000; running: true; repeat: true; triggeredOnStart: true
                 onTriggered: {
                     var now    = new Date()
                     timeText.text = Qt.formatTime(now, "hh:mm AP")
                     var days   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
-                    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+                    var months = ["Jan","Feb","Mar","Apr","May","Jun",
+                                  "Jul","Aug","Sep","Oct","Nov","Dec"]
                     var day    = String(now.getDate()).padStart(2, "0")
                     dateText.text = days[now.getDay()] + ", " + day + " " + months[now.getMonth()]
                 }
@@ -368,14 +398,15 @@ Rectangle {
         // ── Right pills ───────────────────────────────────────────
         Row {
             anchors { right: parent.right; rightMargin: 8; verticalCenter: parent.verticalCenter }
-            spacing: 6
+            spacing: 10
 
-            // ── Stats ─────────────────────────────────────────────
+            // Stats pill
             Rectangle {
                 height: 28
                 width: statsRow.width + 16
                 radius: 14
-                color: Colors.md3.surface
+                color: resourcePopupWindow.visible ? Colors.md3.surface_container_high : Colors.md3.surface_container_lowest
+                Behavior on color { ColorAnimation { duration: 150 } }
 
                 Row {
                     id: statsRow
@@ -398,10 +429,17 @@ Rectangle {
                         Text { anchors.verticalCenter: parent.verticalCenter; text: bar.ramUsage; font.family: "JetBrainsMono Nerd Font Mono"; font.pixelSize: 13; color: Colors.md3.on_surface }
                     }
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: resourcePopupWindow.visible = !resourcePopupWindow.visible
+                }
             }
 
-            // ── Wifi ──────────────────────────────────────────────
+            // Wifi pill
             Item {
+                id: wifiItem
                 height: 28
                 width: wifiPillRect.width
 
@@ -427,8 +465,8 @@ Rectangle {
                     }
                 }
 
-                property bool   wifiConnected: Networking.connectivity === NetworkConnectivity.Full
-                                            || Networking.connectivity === NetworkConnectivity.Limited
+                property bool wifiConnected: Networking.connectivity === NetworkConnectivity.Full
+                                           || Networking.connectivity === NetworkConnectivity.Limited
                 property string wifiSsid: {
                     for (var i = 0; i < deviceRep.count; i++) {
                         var s = deviceRep.itemAt(i).connectedSsid
@@ -442,7 +480,7 @@ Rectangle {
                     height: 28
                     width: wifiRow.width + 16
                     radius: 14
-                    color: Colors.md3.surface
+                    color: Colors.md3.surface_container_lowest
                     Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
                     Row {
@@ -452,22 +490,22 @@ Rectangle {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: parent.parent.parent.wifiConnected ? "󰤨" : "󰤭"
+                            text:    wifiItem.wifiConnected ? "󰤨" : "󰤭"
                             font.family: "JetBrainsMono Nerd Font Mono"
                             font.pixelSize: 20
-                            color:   parent.parent.parent.wifiConnected ? Colors.md3.primary : Colors.md3.on_surface_variant
-                            opacity: parent.parent.parent.wifiConnected ? 1.0 : 0.4
+                            color:   wifiItem.wifiConnected ? Colors.md3.primary : Colors.md3.on_surface_variant
+                            opacity: wifiItem.wifiConnected ? 1.0 : 0.4
                             Behavior on color   { ColorAnimation  { duration: 200 } }
                             Behavior on opacity { NumberAnimation { duration: 200 } }
                         }
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: parent.parent.parent.wifiSsid
+                            text:    wifiItem.wifiSsid
                             font.family: "JetBrainsMono Nerd Font Mono"
                             font.pixelSize: 12
-                            color: Colors.md3.primary
-                            visible: parent.parent.parent.wifiConnected && parent.parent.parent.wifiSsid !== ""
+                            color:   Colors.md3.primary
+                            visible: wifiItem.wifiConnected && wifiItem.wifiSsid !== ""
                         }
                     }
 
@@ -479,7 +517,7 @@ Rectangle {
                 }
             }
 
-            // ── Bluetooth ─────────────────────────────────────────
+            // Bluetooth pill
             Item {
                 height: 28
                 width: btPillRect.width
@@ -515,7 +553,7 @@ Rectangle {
                     height: 28
                     width: btRow.width + 16
                     radius: 14
-                    color: Colors.md3.surface
+                    color: Colors.md3.surface_container_lowest
                     Behavior on width { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
                     Row {
@@ -545,13 +583,13 @@ Rectangle {
                 }
             }
 
-            // ── Brightness ────────────────────────────────────────
+            // Brightness pill
             Rectangle {
                 id: brightnessPill
                 height: 28
                 width: brightnessRow.width + 16
                 radius: 14
-                color: Colors.md3.surface
+                color: Colors.md3.surface_container_lowest
 
                 property int brightPct: bar.brightnessMax > 0
                     ? Math.round(bar.brightnessVal * 100 / bar.brightnessMax)
@@ -597,78 +635,76 @@ Rectangle {
                         brightnessSetProc.running   = true
                     }
                 }
-              }
-
-// ── Volume ────────────────────────────────────────────────────────
-Rectangle {
-    id: volumePill
-    height: 28
-    width: volumeRow.width + 16
-    radius: 14
-    color: Colors.md3.surface
-
-    Timer {
-        id: scrollDebounce
-        interval: 50
-        repeat: false
-    }
-
-    Row {
-        id: volumeRow
-        anchors.centerIn: parent
-        spacing: 6
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: {
-                if (bar.volMuted || bar.volPct === 0) return "󰝟"
-                if (bar.volPct <= 33) return "󰕿"
-                if (bar.volPct <= 66) return "󰖀"
-                return "󰕾"
             }
-            font.family: "JetBrainsMono Nerd Font Mono"
-            font.pixelSize: 18
-            color:   bar.volMuted ? Colors.md3.on_surface_variant : Colors.md3.on_surface
-            opacity: bar.volMuted ? 0.5 : 1.0
-            Behavior on color   { ColorAnimation  { duration: 150 } }
-            Behavior on opacity { NumberAnimation { duration: 150 } }
-        }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: bar.volPct
-            font.family: "JetBrainsMono Nerd Font Mono"
-            font.pixelSize: 13
-            color:   bar.volMuted ? Colors.md3.on_surface_variant : Colors.md3.on_surface
-            opacity: bar.volMuted ? 0.5 : 1.0
-            Behavior on color   { ColorAnimation  { duration: 150 } }
-            Behavior on opacity { NumberAnimation { duration: 150 } }
-        }
-    }
+            // Volume pill
+            Rectangle {
+                id: volumePill
+                height: 28
+                width: volumeRow.width + 16
+                radius: 14
+                color: Colors.md3.surface_container_lowest
 
-// in volumePill MouseArea
-MouseArea {
-    anchors.fill: parent
-    cursorShape: Qt.PointingHandCursor
-    onClicked: pwvucontrolProc.running = true
-    onWheel: wheel => {
-        if (!bar.pwAudio || scrollDebounce.running) return
-        scrollDebounce.start()
-        var direction = wheel.angleDelta.y > 0 ? 1 : -1
-        bar.pwAudio.volume = Math.max(0.0, Math.min(1.0, bar.pwAudio.volume + direction * 0.05))
-    }
-}
-}
+                Timer {
+                    id: scrollDebounce
+                    interval: 50
+                    repeat: false
+                }
 
-                
+                Row {
+                    id: volumeRow
+                    anchors.centerIn: parent
+                    spacing: 6
 
-            // ── Battery ───────────────────────────────────────────
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: {
+                            if (bar.volMuted || bar.volPct === 0) return "󰝟"
+                            if (bar.volPct <= 33) return "󰕿"
+                            if (bar.volPct <= 66) return "󰖀"
+                            return "󰕾"
+                        }
+                        font.family: "JetBrainsMono Nerd Font Mono"
+                        font.pixelSize: 18
+                        color:   bar.volMuted ? Colors.md3.on_surface_variant : Colors.md3.on_surface
+                        opacity: bar.volMuted ? 0.5 : 1.0
+                        Behavior on color   { ColorAnimation  { duration: 150 } }
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: bar.volPct
+                        font.family: "JetBrainsMono Nerd Font Mono"
+                        font.pixelSize: 13
+                        color:   bar.volMuted ? Colors.md3.on_surface_variant : Colors.md3.on_surface
+                        opacity: bar.volMuted ? 0.5 : 1.0
+                        Behavior on color   { ColorAnimation  { duration: 150 } }
+                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: pwvucontrolProc.running = true
+                    onWheel: wheel => {
+                        if (!bar.pwAudio || scrollDebounce.running) return
+                        scrollDebounce.start()
+                        var direction = wheel.angleDelta.y > 0 ? 1 : -1
+                        bar.pwAudio.volume = Math.max(0.0, Math.min(1.0,
+                            bar.pwAudio.volume + direction * 0.05))
+                    }
+                }
+            }
+
+            // Battery pill
             Rectangle {
                 id: batteryPill
                 height: 28
                 width: batteryRow.width + 16
                 radius: 14
-                color: batteryPopupWindow.visible ? Colors.md3.surface_container_high : Colors.md3.surface
+                color: batteryPopupWindow.visible ? Colors.md3.surface_container_high : Colors.md3.surface_container_lowest
                 visible: UPower.displayDevice.isLaptopBattery
                 Behavior on color { ColorAnimation { duration: 150 } }
 
@@ -710,7 +746,7 @@ MouseArea {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: batteryPill.pct + "%"
+                        text: batteryPill.pct
                         font.family: "JetBrainsMono Nerd Font Mono"
                         font.pixelSize: 13
                         color: Colors.md3.on_surface
